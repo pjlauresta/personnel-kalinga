@@ -57,6 +57,12 @@ const TriageSystem = () => {
   return (
     <Layout>
       <div className="content">
+
+        {/* === PAGE TITLE === */}
+        <div className="page-header">
+          <h1 className="page-title">Triage System</h1>
+        </div>
+
         {/* === TRIAGE CARD === */}
         <div className="triage-card">
           <div className="triage-header">
@@ -132,7 +138,8 @@ const TriageSystem = () => {
           ))}
         </div>
       </div>
-       <Footer />
+
+      <Footer />
     </Layout>
   );
 };

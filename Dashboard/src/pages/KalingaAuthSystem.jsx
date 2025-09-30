@@ -163,25 +163,22 @@ const KalingaAuthSystem = () => {
               <div className="grid-2">
                 <div className="grid-3">
                   <select
-                    className="select"
-                    value={form.dob.month}
-                    onChange={(e) => updateDOB("month", e.target.value)}
-                  >
-                    <option>Month</option>
-                    {[
-                      "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",
-                    ].map((m, i) => (
-                      <option key={i} value={i + 1}>
-                        {m}
-                      </option>
-                    ))}
-                  </select>
+  className="select"
+  value={form.dob.month}
+  onChange={(e) => updateDOB("month", e.target.value)}
+>
+  <option value="" disabled hidden>Month</option>
+  {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => (
+    <option key={i} value={i + 1}>{m}</option>
+  ))}
+</select>
+
                   <select
                     className="select"
                     value={form.dob.day}
                     onChange={(e) => updateDOB("day", e.target.value)}
                   >
-                    <option>Day</option>
+                    <option value="" disabled hidden>Day</option>
                     {Array.from({ length: 31 }, (_, i) => (
                       <option key={i} value={i + 1}>
                         {i + 1}
@@ -222,7 +219,7 @@ const KalingaAuthSystem = () => {
                 <option value="emergency-responder">Emergency Responder</option>
                 <option value="medical-personnel">Medical Personnel</option>
                 <option value="coordinator">Emergency Coordinator</option>
-                <option value="admin">Administrator</option>
+
               </select>
 
               <div className="grid-2">

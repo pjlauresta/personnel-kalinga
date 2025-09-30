@@ -1,22 +1,24 @@
-// src/Layout.jsx
+// src/layouts/Layout.jsx
 import React from "react";
-import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
-import "../styles/personnel-style.css";
-
+import Sidebar from "../components/Sidebar";
+import "../styles/layout.css";
 
 const Layout = ({ children }) => {
   return (
-    <div className="container">
-      {/* Sidebar */}
+    <div className="layout-container">
+      {/* Sidebar fixed on the left */}
       <Sidebar />
 
-      {/* Main Content */}
-      <div className="main dashboard-main">
+      {/* Right side: Topbar + Content + Footer */}
+      <div className="layout-main">
         <Topbar />
         
-        {/* Ito yung laman ng bawat page */}
-        {children}
+        {/* Main Page Content */}
+        <main className="layout-content">
+          {children}
+        </main>
+
       </div>
     </div>
   );

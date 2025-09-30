@@ -3,14 +3,12 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
 import "../styles/personnel-style.css";
 
 const COLORS = ["#1E2A78", "#C0392B", "#145A32", "#F1C40F"]; 
-// Water, Food, Medicines, Clothes
 
 // ✅ Data for all centers combined
 const allCentersData = [
@@ -55,8 +53,11 @@ const ResourcesCard = () => {
   return (
     <div className="card resources-card">
       <h3 className="card-title">Resources</h3>
-      <div className="resources-container">
-        {/* ✅ Legend */}
+
+      {/* ✅ Main Row (Legend + Donut + Centers 1-3) */}
+      <div className="resources-main-row">
+
+        {/* Legend */}
         <div className="resources-legend">
           <h4>All Centers</h4>
           <ul>
@@ -67,9 +68,8 @@ const ResourcesCard = () => {
           </ul>
         </div>
 
-        {/* ✅ Charts Section */}
-        <div className="resources-charts">
-          {/* All Centers Donut */}
+        {/* Donut */}
+        <div className="resources-donut">
           <ResponsiveContainer width={250} height={250}>
             <PieChart>
               <Pie
@@ -88,32 +88,32 @@ const ResourcesCard = () => {
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
+        </div>
 
-          {/* Individual Centers */}
-          <div className="center-pies">
-            {centers.map((center, i) => (
-              <div key={i} className="center-pie">
-                <h5>{center.name}</h5>
-                <ResponsiveContainer width={160} height={160}>
-                  <PieChart>
-                    <Pie
-                      data={center.data}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={70}
-                      dataKey="value"
-                      labelLine={false}
-                    >
-                      {center.data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            ))}
-          </div>
+        {/* Individual Centers */}
+        <div className="resources-right">
+          {centers.map((center, i) => (
+            <div key={i} className="center-pie">
+              <h5>{center.name}</h5>
+              <ResponsiveContainer width={160} height={160}>
+                <PieChart>
+                  <Pie
+                    data={center.data}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={70}
+                    dataKey="value"
+                    labelLine={false}
+                  >
+                    {center.data.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          ))}
         </div>
       </div>
     </div>

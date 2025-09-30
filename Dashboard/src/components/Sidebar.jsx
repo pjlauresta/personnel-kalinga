@@ -57,6 +57,7 @@ const Sidebar = () => {
           <Link to="/settings">Settings</Link>
         </li>
       </ul>
+      
     </div>
   );
 };
