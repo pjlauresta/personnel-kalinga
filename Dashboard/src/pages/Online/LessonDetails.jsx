@@ -1,14 +1,12 @@
-// src/pages/Online/LessonDetails.jsx
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../../layouts/Layout";
 import Footer from "../../components/Footer";
 import courseContent from "../../data/courseContent";
 import "../../styles/lessonDetails.css";
+import { markLessonComplete } from "../../lib/progressUtils";
 
-/**
- * slugify - matches the slugify used in CourseDetails so links are consistent
- */
+
 const slugify = (text = "") =>
   text
     .toString()
@@ -17,6 +15,11 @@ const slugify = (text = "") =>
     .replace(/&/g, "-and-")
     .replace(/[\s\W-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+const handleNextActivity = () => {
+  markLessonComplete("generalInfo", currentLessonId); // or "helpfulMaterials", depending on section
+  navigate(nextLessonUrl);
+};
 
 export default function LessonDetails() {
   const { id, activitySlug } = useParams(); // route: /modules/:id/activity/:activitySlug
@@ -35,7 +38,6 @@ export default function LessonDetails() {
     );
   }
 
-  // Build activities list from the course.sections (each string becomes an activity)
   const activities = useMemo(
     () =>
       (course.sections || []).map((title) => ({
@@ -45,14 +47,36 @@ export default function LessonDetails() {
     [course]
   );
 
-  // If activitySlug provided, find it; otherwise default to first
   const idx = activitySlug ? activities.findIndex((a) => a.slug === activitySlug) : -1;
   const activeIndex = idx === -1 ? 0 : idx;
   const current = activities[activeIndex];
-
-  // PDF url convention: public/assets/lessons/<courseId>/<activitySlug>.pdf
-  // — place your PDFs there (see instructions below)
   const pdfUrl = `/assets/lessons/${id}/${current.slug}.pdf`;
+
+  // ✅ Completion state
+  const progressKey = `course-progress-${id}`;
+  const [completedLessons, setCompletedLessons] = useState([]);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem(progressKey)) || [];
+    setCompletedLessons(saved);
+  }, [id]);
+
+  const handleMarkComplete = () => {
+    const saved = JSON.parse(localStorage.getItem(progressKey)) || [];
+    if (!saved.includes(current.slug)) {
+      const updated = [...saved, current.slug];
+      localStorage.setItem(progressKey, JSON.stringify(updated));
+      setCompletedLessons(updated);
+      alert(`✅ You have completed: ${current.title}`);
+    }
+
+    // If all lessons completed → redirect to assessment
+    if (completedLessons.length + 1 === activities.length) {
+      setTimeout(() => {
+        navigate(`/assessment/${id}`);
+      }, 600);
+    }
+  };
 
   const handlePrev = () => {
     if (activeIndex > 0) navigate(`/modules/${id}/activity/${activities[activeIndex - 1].slug}`);
@@ -67,6 +91,8 @@ export default function LessonDetails() {
     if (!slug) return;
     navigate(`/modules/${id}/activity/${slug}`);
   };
+
+  const isCompleted = completedLessons.includes(current.slug);
 
   return (
     <Layout>
@@ -88,9 +114,8 @@ export default function LessonDetails() {
           <h3 className="lesson-activity-title">{current.title}</h3>
         </div>
 
-        {/* PDF / resource viewer */}
+        {/* PDF Viewer */}
         <div className="pdf-wrapper">
-          {/* iframe used for PDF viewer. If file does not exist, browser will show "404" - you can provide a fallback link below */}
           <iframe
             title={`${current.title} - ${course.title}`}
             src={pdfUrl}
@@ -99,14 +124,24 @@ export default function LessonDetails() {
           />
         </div>
 
-        {/* If the file cannot be displayed by the browser, provide a download/open link */}
         <div className="pdf-fallback">
           <a href={pdfUrl} target="_blank" rel="noreferrer" className="btn btn-outline">
             Open lesson resource in a new tab / download
           </a>
         </div>
 
-        {/* Controls: Prev / Jump-to / Next */}
+        {/* ✅ Mark as complete */}
+        <div className="completion-wrapper">
+          <button
+            onClick={handleMarkComplete}
+            className={`btn ${isCompleted ? "btn-disabled" : "btn-success"}`}
+            disabled={isCompleted}
+          >
+            {isCompleted ? "Completed ✅" : "Mark as Complete"}
+          </button>
+        </div>
+
+        {/* Controls */}
         <div className="lesson-controls">
           <button onClick={handlePrev} className="btn btn-light" disabled={activeIndex === 0}>
             Back
@@ -127,18 +162,24 @@ export default function LessonDetails() {
             className="btn btn-light"
             disabled={activeIndex === activities.length - 1}
           >
-            Next 
+            Next
           </button>
         </div>
 
-        {/* Small list of all activities on the right (optional) */}
+        {/* Sidebar list */}
         <div className="lesson-activity-list">
-          <h4>All Lessons </h4>
+          <h4>All Lessons</h4>
           <ul>
             {activities.map((a, i) => (
-              <li key={a.slug} className={i === activeIndex ? "active" : ""}>
+              <li
+                key={a.slug}
+                className={`${i === activeIndex ? "active" : ""} ${
+                  completedLessons.includes(a.slug) ? "done" : ""
+                }`}
+              >
                 <Link to={`/modules/${id}/activity/${a.slug}`}>
-                  {i + 1}. {a.title}
+                  {i + 1}. {a.title}{" "}
+                  {completedLessons.includes(a.slug) && <span className="check">✓</span>}
                 </Link>
               </li>
             ))}

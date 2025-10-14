@@ -169,3 +169,10 @@
 .course-lesson { margin-left: 1.2rem; color: #4b5563; }
 .course-quiz { margin-left: 1.2rem; font-weight: 700; color: #065f46; }
 .course-pretest { margin-left: 0.6rem; color: #065f46; }
+
+/* add to src/styles/courseDetails.css */
+.course-subitem { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; }
+.course-section-content p { color: #123; line-height: 1.6; }
+.btn { padding: 8px 12px; border-radius: 6px; text-decoration: none; }
+.btn-primary { background: #02462E; color: #fff; }
+.btn-outline { border: 1px solid #02462E; color: #02462E; background: transparent; padding: 6px 10px; border-radius: 6px; text-decoration:none; }

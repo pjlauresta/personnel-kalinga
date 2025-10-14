@@ -2261,3 +2261,199 @@ body {
 
 .material-item, .activity-item, .quiz-item { background:#fff; padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
 .material-type { font-size:12px; color:#6d6d6d; margin-right:12px; }
+.profile-card {
+  position: relative;
+  padding: 2rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.profile-avatar {
+  background: #0a5a33;
+  border-radius: 50%;
+  padding: 10px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #02462E;
+  margin: 0;
+}
+
+.edit-btn {
+  background: #f4f6f5;
+  border: none;
+  color: #02462E;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.edit-btn:hover {
+  background: #e2e8e5;
+}
+
+.input-edit {
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.label {
+  color: #02462E;
+  font-weight: 600;
+}
+
+.profile-icons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 15px;
+}
+
+.profile-icons i {
+  font-size: 1.3rem;
+  color: #02462E;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.profile-icons i:hover {
+  color: #0077b5;
+}
+
+.save-btn {
+  background: #02462E;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.settings-section ul li {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.settings-section ul li:hover {
+  background: #02462e;
+  color: #fff;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.modal-close:hover {
+  color: #02462e;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.modal-content label {
+  display: block;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+  border-color: #02462e;
+}
+
+.save-btn {
+  margin-top: 20px;
+  background: #02462e;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-btn:hover {
+  background: #036c49;
+}

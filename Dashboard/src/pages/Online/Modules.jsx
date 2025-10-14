@@ -59,18 +59,78 @@ const CATEGORY_ICONS = {
 
 // Expanded Courses (IDs must match CourseDetails.jsx)
 const COURSES = [
-  { id: 1, title: "Professional Development Training Certificate (PDTC)", category: "Recently Viewed Courses", type: "Continuing Professional Development & Licensing" },
-  { id: 2, title: "Emergency Management Certificate Program", category: "Recently Viewed Courses", type: "Disaster Response & Management" },
-  { id: 3, title: "Basic Life Support / Emergency Medical Responder (EMR)", category: "Recently Viewed Courses", type: "Basic Life Support (BLS) & Advanced Cardiac Life Support (ACLS)" },
-  { id: 4, title: "Psychological First Aid Basics", category: "Recently Viewed Courses", type: "Mental Health & Psychological First Aid" },
-  { id: 5, title: "Hazardous Materials Awareness Training", category: "Most Popular Certificates", type: "Disaster Response & Management" },
-  { id: 6, title: "Emergency Shelter Management & Logistics", category: "Most Popular Certificates", type: "Community Health & Outreach" },
-  { id: 7, title: "First Aid and CPR Certification", category: "Most Popular Certificates", type: "Basic Life Support (BLS) & Advanced Cardiac Life Support (ACLS)" },
-  { id: 8, title: "Pediatric Advanced Life Support (PALS)", category: "Most Popular Certificates", type: "Basic Life Support (BLS) & Advanced Cardiac Life Support (ACLS)" },
-  { id: 9, title: "Infectious Disease Control Essentials", category: "Most Popular Certificates", type: "Infectious Disease Control & Public Health" },
-  { id: 10, title: "Telemedicine Practices in Modern Healthcare", category: "Most Popular Certificates", type: "Telemedicine & Digital Health Tools" },
-  { id: 11, title: "Nursing Care for Post-Operative Patients", category: "Most Popular Certificates", type: "Nursing & Patient Care" },
-  { id: 12, title: "Ethics & Legal Issues in Clinical Practice", category: "Most Popular Certificates", type: "Medical Ethics & Legal Standards" },
+  {
+    id: 1,
+    title: "Barangay First 1000 Days Facilitator's Guide eTraining",
+    category: "Recently Viewed Courses",
+    type: "Community Health & Outreach",
+  },
+  {
+    id: 2,
+    title: "DOH Integrated People-Centered Health Services",
+    category: "Recently Viewed Courses",
+    type: "Continuing Professional Development & Licensing",
+  },
+  {
+    id: 3,
+    title: "Integrated Course on Primary Care",
+    category: "Recently Viewed Courses",
+    type: "Community Health & Outreach",
+  },
+  {
+    id: 4,
+    title: "Introduction to Seven Major Recommendations to Prevent Tuberculosis Transmission",
+    category: "Recently Viewed Courses",
+    type: "Infectious Disease Control & Public Health",
+  },
+  {
+    id: 5,
+    title: "Healthy Hearts Technical Package",
+    category: "Most Popular Certificates",
+    type: "Continuing Professional Development & Licensing",
+  },
+  {
+    id: 6,
+    title: "Basic Course in Family Planning Final Exam and Certificate of Training",
+    category: "Most Popular Certificates",
+    type: "Community Health & Outreach",
+  },
+  {
+    id: 7,
+    title: "Nutrition Care Process for Clinical Nutritionist Dietitians",
+    category: "Most Popular Certificates",
+    type: "Community Health & Outreach",
+  },
+  {
+    id: 8,
+    title: "Basic Life Support Online Training - Didactic [NCMH - 2025 BATCH 10]",
+    category: "Most Popular Certificates",
+    type: "Basic Life Support (BLS) & Advanced Cardiac Life Support (ACLS)",
+  },
+  {
+    id: 9,
+    title: "Basic Course on Continuous Quality Improvement for Health Facilities",
+    category: "Most Popular Certificates",
+    type: "Continuing Professional Development & Licensing",
+  },
+  {
+    id: 10,
+    title: "Data to Policy Competency 1 - Problem Statement",
+    category: "Most Popular Certificates",
+    type: "Continuing Professional Development & Licensing",
+  },
+  {
+    id: 11,
+    title: "Orientation on Navigating the Continuing Professional Accreditation System (CPDAS)",
+    category: "Most Popular Certificates",
+    type: "Continuing Professional Development & Licensing",
+  },
+  {
+    id: 12,
+    title: "Laboratory Quality Management System Online Training",
+    category: "Most Popular Certificates",
+    type: "Infectious Disease Control & Public Health",
+  },
 ];
 
 const TABS = ["Courses", "Personal Training Record"];

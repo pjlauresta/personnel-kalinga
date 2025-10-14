@@ -1,6 +1,6 @@
 // src/pages/Online/CourseDetails.jsx
-import React from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Layout from "../../layouts/Layout";
 import Footer from "../../components/Footer";
 import {
@@ -11,520 +11,554 @@ import {
 } from "react-icons/fa";
 import "../../styles/courseDetails.css";
 
-const CourseDetails = () => {
-  const { id } = useParams();
+// ----------------------
+// 🔹 Helper Functions
+// ----------------------
+const getProgress = () =>
+  JSON.parse(localStorage.getItem("courseProgress")) || {
+    generalInfo: [],
+    helpfulMaterials: [],
+    trainingMaterials: [],
+  };
 
-  // -----------------------
-  // All 12 courses content
-  // -----------------------
-  const courseData = {
-    "1": {
-      title: "Professional Development Training Certificate (PDTC)",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "Course Outline & Objectives", "Revision History"],
-        },
-        {
-          heading: "Helpful Material",
-          items: ["References", "Recommended Reading", "Templates & Forms"],
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Introduction to Professional Growth",
-            "Lesson 1: Career Pathways",
-            "Lesson 2: Skill Development",
-            "Lesson 3: Time Management",
-            "Lesson 4: Leadership Essentials",
-            "Quiz",
-            "Module 2: Advanced Professional Development",
-            "Lesson 1: Networking Strategies",
-            "Lesson 2: Conflict Resolution",
-            "Lesson 3: Communication Skills",
-            "Lesson 4: Workplace Ethics",
-            "Final Assessment",
-          ],
-        },
-      ],
-    },
+const markLessonComplete = (section, lessonId) => {
+  const progress = getProgress();
+  if (!progress[section].includes(lessonId)) {
+    progress[section].push(lessonId);
+    localStorage.setItem("courseProgress", JSON.stringify(progress));
+  }
+};
 
+const isSectionComplete = (section, totalLessons) => {
+  const progress = getProgress();
+  return progress[section].length >= totalLessons;
+};
+
+// ----------------------
+// 🔹 All Courses Data (1–12)
+// ----------------------
+const allCourses = {
+  "1": {
+    title: "Barangay First 1000 Days Facilitator's Guide eTraining",
+    sections: [
+      {
+        heading: "General Information",
+        items: [
+          "Welcome Message",
+          "Course Overview & Objectives",
+          "Training Flow & Requirements",
+          "Facilitator’s Guide Outline",
+        ],
+      },
+      {
+        heading: "Helpful Material",
+        items: [
+          "Reference Materials",
+          "Nutrition Policy Documents",
+          "Community Tools & Templates",
+          "Sample Session Plans",
+        ],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Understanding the First 1000 Days",
+          "Lesson 1: Importance of Early Nutrition",
+          "Lesson 2: Maternal and Child Health Integration",
+          "Lesson 3: Key Nutrition Interventions",
+          "Quiz",
+          "Module 2: Community Mobilization Strategies",
+          "Lesson 1: Engaging Stakeholders",
+          "Lesson 2: Conducting Barangay Sessions",
+          "Lesson 3: Monitoring and Evaluation Tools",
+          "Lesson 4: Success Stories and Case Studies",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
+ 
     "2": {
-      title: "Emergency Management Certificate Program",
+      title: "DOH Integrated People-Centered Health Services",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Learning Goals", "Course Overview"],
+          items: ["Welcome", "Program Overview", "Learning Objectives"],
+          content: ``, // placeholder
         },
         {
           heading: "Helpful Material",
-          items: ["Reference Guide", "Incident Command (ICS) Cheatsheet"],
+          items: ["IPCHS Framework", "Implementation Manual", "Case References"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Basics of Emergency Preparedness",
-            "Lesson 1: Risk Assessment",
-            "Lesson 2: Disaster Readiness",
-            "Lesson 3: Evacuation Protocols",
-            "Lesson 4: Crisis Communication",
-            "Quiz",
-            "Module 2: Advanced Emergency Management",
-            "Lesson 1: Incident Command System (ICS)",
-            "Lesson 2: Community Resilience",
-            "Lesson 3: Emergency Logistics",
-            "Lesson 4: Recovery Strategies",
+            "Module 1: Understanding IPCHS",
+            "Module 2: Service Integration in the Community",
+            "Module 3: Health Systems Strengthening",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "3": {
-      title: "Basic Life Support / Emergency Medical Responder (EMR)",
+      title: "Integrated Course on Primary Care",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Course Requirements", "Safety Protocols"],
+          items: ["Overview", "Course Goals", "Prerequisites"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Training Manual", "First Aid Quick Reference Cards"],
+          items: ["Primary Care Guidelines", "PHC Policy Framework"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: CPR & Basic Life Support",
-            "Lesson 1: Adult CPR",
-            "Lesson 2: Child & Infant CPR",
-            "Lesson 3: Use of AED",
-            "Lesson 4: Airway Management",
-            "Quiz",
-            "Module 2: Emergency Response Essentials",
-            "Lesson 1: Patient Assessment (Primary Survey)",
-            "Lesson 2: First Aid for Trauma",
-            "Lesson 3: Shock Management",
-            "Lesson 4: Scene Safety & PPE",
+            "Module 1: Core Primary Health Care Concepts",
+            "Module 2: Preventive and Promotive Services",
+            "Module 3: Primary Care Practice Models",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "4": {
-      title: "Psychological First Aid Basics",
+      title:
+        "Introduction to Seven Major Recommendations to Prevent Tuberculosis Transmission",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Overview of PFA", "Revision History"],
+          items: ["Welcome", "Background", "Learning Outcomes"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Reference Articles", "PFA Handouts", "Referral Resources"],
+          items: ["TB Prevention Toolkit", "DOH & WHO Guidelines"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Foundations of Psychological First Aid",
-            "Lesson 1: Understanding Stress Reactions",
-            "Lesson 2: Immediate Psychological Needs",
-            "Lesson 3: Building Rapport & Safety",
-            "Lesson 4: Active Listening Skills",
-            "Quiz",
-            "Module 2: PFA in Practice",
-            "Lesson 1: Supporting Survivors & Families",
-            "Lesson 2: Cultural Sensitivity in PFA",
-            "Lesson 3: Referral & Follow-up",
-            "Lesson 4: Self-care for Providers",
+            "Module 1: Overview of TB Transmission",
+            "Module 2: Seven Core Recommendations Explained",
+            "Module 3: Implementing TB Prevention Measures",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "5": {
-      title: "Hazardous Materials Awareness Training",
+      title: "Healthy Hearts Technical Package",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Hazmat Basics", "Revision History"],
+          items: ["Introduction", "Program Goals", "Heart Health Basics"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Safety Data Sheets (SDS) Guide", "Labeling & Placard Resources"],
+          items: ["Healthy Hearts Toolkit", "Cardiovascular Guidelines"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: HazMat Identification",
-            "Lesson 1: Recognizing Hazardous Substances",
-            "Lesson 2: Labeling Standards & Placards",
-            "Lesson 3: Safety Signs & Symbols",
-            "Lesson 4: Initial Response & Isolation",
-            "Quiz",
-            "Module 2: HazMat Response & Decontamination",
-            "Lesson 1: Protective Equipment Selection",
-            "Lesson 2: Containment Procedures",
-            "Lesson 3: Emergency Decontamination",
-            "Lesson 4: Reporting & Documentation",
+            "Module 1: Understanding Cardiovascular Risk Factors",
+            "Module 2: Implementing HEARTS Interventions",
+            "Module 3: Monitoring & Evaluation Framework",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "6": {
-      title: "Emergency Shelter Management & Logistics",
+      title:
+        "Basic Course in Family Planning Final Exam and Certificate of Training",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Shelter Operating Principles", "Revision History"],
+          items: ["Overview", "Course Objectives", "Accreditation Details"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Shelter Checklists", "Supply & Inventory Templates"],
+          items: ["FP Handbook", "Clinical Protocols", "Service Delivery Tools"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Shelter Setup & Operations",
-            "Lesson 1: Site Selection & Layout",
-            "Lesson 2: Registration & Intake Procedures",
-            "Lesson 3: Shelter Health & Sanitation",
-            "Lesson 4: Security & Protection",
-            "Quiz",
-            "Module 2: Logistics & Coordination",
-            "Lesson 1: Resource Allocation",
-            "Lesson 2: Volunteer Management",
-            "Lesson 3: Supply Chain Basics",
-            "Lesson 4: Reporting & Handover",
+            "Module 1: Family Planning Concepts",
+            "Module 2: Counseling and Client-Centered Approach",
+            "Module 3: FP Commodities and Logistics",
+            "Module 4: Program Management and Reporting",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "7": {
-      title: "First Aid and CPR Certification",
+      title: "Nutrition Care Process for Clinical Nutritionist Dietitians",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Importance of CPR", "Certification Requirements"],
+          items: ["Introduction", "Purpose of the Course", "Expected Outcomes"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["CPR Pocket Guide", "Wound Care Quick Reference"],
+          items: ["NCP Reference Guide", "Sample Nutrition Plans"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Basic First Aid",
-            "Lesson 1: CPR Techniques",
-            "Lesson 2: Wound Care & Bandaging",
-            "Lesson 3: Bleeding Control",
-            "Lesson 4: Burn Management",
-            "Quiz",
-            "Module 2: Emergency Scenarios",
-            "Lesson 1: Choking Management",
-            "Lesson 2: Heart Attack Recognition",
-            "Lesson 3: Stroke Recognition",
-            "Lesson 4: Fractures & Splinting",
+            "Module 1: Nutrition Assessment and Diagnosis",
+            "Module 2: Intervention and Monitoring",
+            "Module 3: Documentation and Evaluation",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "8": {
-      title: "Pediatric Advanced Life Support (PALS)",
+      title:
+        "Basic Life Support Online Training - Didactic [NCMH - 2025 BATCH 10]",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Course Overview", "Pediatric Resuscitation Guidelines"],
+          items: ["Welcome", "Course Requirements", "Completion Criteria"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["PALS Algorithms", "Pediatric Drug Dosing Chart"],
+          items: ["BLS Manual", "CPR Flowchart", "AED Use Guidelines"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Pediatric Respiratory & Airway Management",
-            "Lesson 1: Infant Airway Basics",
-            "Lesson 2: Child Airway Considerations",
-            "Lesson 3: AED & Defibrillation in Pediatrics",
-            "Lesson 4: Ventilation Strategies",
+            "Module 1: Basic Life Support Principles",
+            "Lesson 1: Adult & Pediatric CPR",
+            "Lesson 2: AED Operation",
+            "Lesson 3: Airway Management",
             "Quiz",
-            "Module 2: Pediatric Cardiac Arrest & Shock",
-            "Lesson 1: Recognition of Shock",
-            "Lesson 2: Pediatric Cardiac Arrest Algorithms",
-            "Lesson 3: Post-resuscitation Care",
-            "Lesson 4: Team Resuscitation Roles",
+            "Module 2: Emergency Response",
+            "Lesson 1: Scene Safety & Assessment",
+            "Lesson 2: Post-Resuscitation Care",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "9": {
-      title: "Infectious Disease Control Essentials",
+      title: "Basic Course on Continuous Quality Improvement for Health Facilities",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Disease Prevention", "Revision History"],
+          items: ["Overview", "Course Objectives", "QI Principles"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["WHO/Local Guidelines", "PPE & Isolation Protocols"],
+          items: ["CQI Toolkit", "Performance Indicators", "Case Studies"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Basics of Infection Control",
-            "Lesson 1: Hand Hygiene Practices",
-            "Lesson 2: Proper PPE Use",
-            "Lesson 3: Isolation & Cohorting Procedures",
-            "Lesson 4: Waste & Linen Management",
-            "Quiz",
-            "Module 2: Outbreak Detection & Response",
-            "Lesson 1: Surveillance Basics",
-            "Lesson 2: Case Investigation",
-            "Lesson 3: Vaccination Protocols",
-            "Lesson 4: Community Measures & Communication",
+            "Module 1: Understanding QI Concepts",
+            "Module 2: Data-Driven Improvement",
+            "Module 3: Implementing CQI Cycles",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "10": {
-      title: "Telemedicine Practices in Modern Healthcare",
+      title: "Data to Policy Competency 1 - Problem Statement",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Overview of Telemedicine", "Scope & Use Cases"],
+          items: ["Welcome", "Competency Overview", "Learning Objectives"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Telehealth Best Practices", "Data Privacy Checklist"],
+          items: ["Policy Brief Templates", "Data Analysis Tools"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Telemedicine Foundations",
-            "Lesson 1: Virtual Consultation Workflow",
-            "Lesson 2: Patient Communication Online",
-            "Lesson 3: Technology & Equipment Requirements",
-            "Lesson 4: Clinical Limitations & Triage",
-            "Quiz",
-            "Module 2: Advanced Telehealth",
-            "Lesson 1: Remote Monitoring Tools",
-            "Lesson 2: Data Privacy & Consent",
-            "Lesson 3: Integration with EHR",
-            "Lesson 4: Billing & Legal Considerations",
+            "Module 1: Understanding the Policy Process",
+            "Module 2: Identifying and Framing Problems",
+            "Module 3: Crafting Evidence-Based Policy Statements",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "11": {
-      title: "Nursing Care for Post-Operative Patients",
+      title:
+        "Orientation on Navigating the Continuing Professional Accreditation System (CPDAS)",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Post-Op Care Basics", "Revision History"],
+          items: ["Welcome", "System Overview", "User Roles and Access"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Care Plans", "Pain Management Protocols", "Discharge Checklists"],
+          items: ["CPDAS User Guide", "Accreditation FAQs"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Immediate Post-Op Care",
-            "Lesson 1: Wound Care & Dressing Changes",
-            "Lesson 2: Monitoring Vitals Post-Op",
-            "Lesson 3: Pain Management Principles",
-            "Lesson 4: Preventing Post-Op Complications",
-            "Quiz",
-            "Module 2: Rehabilitation & Follow-up",
-            "Lesson 1: Mobilization & PT Coordination",
-            "Lesson 2: Medication Management",
-            "Lesson 3: Patient Education for Home Care",
-            "Lesson 4: When to Escalate Care",
+            "Module 1: Accessing the CPDAS Portal",
+            "Module 2: Managing Accreditation Records",
+            "Module 3: Uploading Certificates and Evaluations",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
 
     "12": {
-      title: "Ethics & Legal Issues in Clinical Practice",
+      title: "Laboratory Quality Management System Online Training",
       sections: [
         {
           heading: "General Information",
-          items: ["Welcome", "Ethical Principles", "Revision History"],
+          items: ["Welcome", "Course Introduction", "Quality System Essentials"],
+          content: ``,
         },
         {
           heading: "Helpful Material",
-          items: ["Case Studies", "Legal References", "Consent Forms"],
+          items: ["LQMS Manual", "Documentation Templates", "WHO Standards"],
+          content: ``,
         },
         {
           heading: "Training Material",
           items: [
             "Pre-Test",
-            "Module 1: Foundations of Medical Ethics",
-            "Lesson 1: Autonomy & Informed Consent",
-            "Lesson 2: Beneficence & Non-maleficence",
-            "Lesson 3: Confidentiality & Privacy",
-            "Lesson 4: Professional Boundaries",
-            "Quiz",
-            "Module 2: Legal Issues in Practice",
-            "Lesson 1: Documentation & Records",
-            "Lesson 2: Liability & Malpractice Basics",
-            "Lesson 3: Consent & Capacity",
-            "Lesson 4: Regulatory Compliance",
+            "Module 1: Introduction to Quality Management",
+            "Module 2: Laboratory Process Control",
+            "Module 3: Internal Audits & Corrective Actions",
             "Final Assessment",
           ],
+          content: ``,
         },
       ],
     },
   };
 
-  // --------------------------------------
-  // Helpers
-  // --------------------------------------
-  const getIcon = (sectionHeading) => {
-    if (sectionHeading.includes("General"))
+
+// ----------------------
+// 🔹 Component
+// ----------------------
+const CourseDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(getProgress());
+
+  useEffect(() => {
+    setProgress(getProgress());
+  }, []);
+
+  const updateProgress = () => {
+    setProgress(getProgress());
+  };
+
+  const getIcon = (heading) => {
+    if (heading.includes("General"))
       return <FaInfoCircle className="text-green-700 text-2xl" />;
-    if (sectionHeading.includes("Helpful"))
+    if (heading.includes("Helpful"))
       return <FaBook className="text-green-700 text-2xl" />;
-    if (sectionHeading.includes("Training"))
+    if (heading.includes("Training"))
       return <FaPlayCircle className="text-green-700 text-2xl" />;
     return <FaClipboardList className="text-green-700 text-2xl" />;
   };
 
-  const isPretest = (item) => /pre-?test/i.test(item);
-  const isQuiz = (item) => /\bquiz\b/i.test(item);
-  const isFinal = (item) =>
-    /final\s*assessment/i.test(item) || /\bfinal\b/i.test(item);
+  const slugify = (text) =>
+    text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
-  const getItemClass = (item) => {
-    const lower = item.toLowerCase();
-    if (lower.startsWith("module")) return "course-subitem course-module";
-    if (lower.startsWith("lesson")) return "course-subitem course-lesson";
-    if (isQuiz(item)) return "course-subitem course-quiz";
-    if (isFinal(item)) return "course-subitem course-final";
-    if (isPretest(item)) return "course-subitem course-pretest";
-    return "course-subitem";
+  // ---------------------------
+  // 🔸 If no course is selected
+  // ---------------------------
+  if (!id) {
+    return (
+      <Layout>
+        <div className="course-wrapper">
+          <h1 className="course-title">Professional Development Courses</h1>
+          <p className="text-gray-600 mb-6">
+            Select a course below to begin your eTraining.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(allCourses).map(([courseId, course]) => (
+              <div
+                key={courseId}
+                className="p-5 bg-white border border-green-700 rounded-lg shadow-sm hover:shadow-md transition"
+              >
+                <h3 className="font-semibold text-green-800 text-lg mb-2">
+                  {course.title}
+                </h3>
+                <button
+                  onClick={() => navigate(`/modules/${courseId}`)}
+                  className="px-3 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 text-sm"
+                >
+                  Open Course
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Footer />
+      </Layout>
+    );
+  }
+
+  // ---------------------------
+  // 🔸 Display selected course
+  // ---------------------------
+  const course = allCourses[id];
+  if (!course)
+    return (
+      <Layout>
+        <p className="p-6 text-red-500">Course not found.</p>
+        <Footer />
+      </Layout>
+    );
+
+  if (!course.sections) {
+    return (
+      <Layout>
+        <div className="course-wrapper">
+          <h1 className="course-title">{course.title}</h1>
+          <p className="text-gray-600">
+            Training materials for this course are not yet available.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-4 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800"
+          >
+            Back
+          </button>
+        </div>
+        <Footer />
+      </Layout>
+    );
+  }
+
+  // ---------------------------
+  // 🔸 Section Unlock Logic
+  // ---------------------------
+  const generalDone = isSectionComplete("generalInfo", 4);
+  const helpfulDone = isSectionComplete("helpfulMaterials", 4);
+
+  const sectionUnlocked = (heading) => {
+    if (heading.includes("General")) return true;
+    if (heading.includes("Helpful")) return generalDone;
+    if (heading.includes("Training")) return generalDone && helpfulDone;
+    return false;
   };
 
-  // ✅ Slugify items for clean URLs
-  const slugify = (text) =>
-    text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-  // fetch course by id
-  const course = courseData[id];
-  if (!course) return <p className="p-6 text-red-500">Course not found.</p>;
-
-  // --------------------------------------
-  // Render
-  // --------------------------------------
+  // ---------------------------
+  // 🔸 UI for Course 1 sections
+  // ---------------------------
   return (
     <Layout>
       <div className="course-wrapper">
-        {/* Title + Breadcrumbs */}
         <h1 className="course-title">{course.title}</h1>
         <p className="course-breadcrumb">Home / Modules / {course.title}</p>
 
-        {/* Sections */}
         <div className="space-y-6">
-          {course.sections.map((section, idx) => (
-            <div key={idx} className="course-card open">
-              {/* Section Header */}
-              <div className="flex items-center gap-3 p-5 bg-white shadow-md rounded-lg border border-green-700">
-                {getIcon(section.heading)}
-                <span className="course-heading-text">{section.heading}</span>
+          {course.sections.map((section, idx) => {
+            const unlocked = sectionUnlocked(section.heading);
+            return (
+              <div
+                key={idx}
+                className={`course-card open ${
+                  unlocked ? "" : "opacity-50 cursor-not-allowed"
+                }`}
+              >
+                <div className="flex items-center gap-3 p-5 bg-white shadow-md rounded-lg border border-green-700">
+                  {getIcon(section.heading)}
+                  <span className="course-heading-text">
+                    {section.heading}
+                    {!unlocked && (
+                      <span className="ml-2 text-sm text-gray-500">
+                        (Locked)
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                {unlocked && (
+                  <div className="course-items">
+                    {section.items.map((item, i) => {
+                      const url = `/modules/${id}/activity/${slugify(item)}`;
+                      return (
+                        <div key={i} className="course-subitem">
+                          <Link
+                            to={url}
+                            onClick={() => {
+                              if (section.heading.includes("General"))
+                                markLessonComplete("generalInfo", item);
+                              if (section.heading.includes("Helpful"))
+                                markLessonComplete("helpfulMaterials", item);
+                              if (section.heading.includes("Training"))
+                                markLessonComplete("trainingMaterials", item);
+                              updateProgress();
+                            }}
+                            className="text-green-700 hover:underline font-semibold"
+                          >
+                            {item}
+                          </Link>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-
-              {/* Section Content */}
-              <div className="course-items">
-                {section.items.map((item, i) => {
-                  // Pre-test link
-                  if (isPretest(item)) {
-                    return (
-                      <div key={i} className={getItemClass(item)}>
-                        <Link
-                          to={`/modules/${id}/assessment/pretest`}
-                          className="text-green-700 hover:underline font-semibold"
-                        >
-                          {item}
-                        </Link>
-                      </div>
-                    );
-                  }
-
-                  // Quiz link
-                  if (isQuiz(item)) {
-                    return (
-                      <div key={i} className={getItemClass(item)}>
-                        <Link
-                          to={`/modules/${id}/assessment/quiz`}
-                          className="text-green-700 hover:underline font-semibold"
-                        >
-                          {item}
-                        </Link>
-                      </div>
-                    );
-                  }
-
-                  // Final assessment link
-                  if (isFinal(item)) {
-                    return (
-                      <div key={i} className={getItemClass(item)}>
-                        <Link
-                          to={`/modules/${id}/assessment/final`}
-                          className="text-green-900 hover:underline font-bold"
-                        >
-                          {item}
-                        </Link>
-                      </div>
-                    );
-                  }
-
-                  // ✅ Default: send all other items to /activity/:slug
-                  return (
-                    <div key={i} className={getItemClass(item)}>
-                      <Link
-                        to={`/modules/${id}/activity/${slugify(item)}`}
-                        className="hover:underline"
-                      >
-                        {item}
-                      </Link>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
-
       <Footer />
     </Layout>
   );

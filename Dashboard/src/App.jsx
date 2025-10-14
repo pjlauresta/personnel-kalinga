@@ -53,6 +53,9 @@ function App() {
           }
         />
 
+        <Route path="/modules/:id/info/:sectionSlug/:topicSlug" element={<InfoPage />} />
+
+
         {/* ✅ Lesson Details (new) */}
         <Route
           path="/modules/:id/activity/:activitySlug"
