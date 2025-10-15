@@ -1,23 +1,94 @@
-import React from "react";
+// src/components/TriageCard.jsx
+import React, { useEffect, useState } from "react";
 import "../styles/triage-style.css";
 
-const triageData = [
-  { center: "Evacuation Center 1", low: 124, medium: 4, high: 28, veryHigh: 32, critical: 1 },
-  { center: "Evacuation Center 2", low: 102, medium: 56, high: 58, veryHigh: 43, critical: 10 },
-  { center: "Evacuation Center 3", low: 73, medium: 34, high: 58, veryHigh: 30, critical: 4 },
-  { center: "Evacuation Center 4", low: 55, medium: 50, high: 58, veryHigh: 88, critical: 12 },
+// ✅ DOH Hospitals in Metro Manila (same dataset used in MapCard)
+const hospitals = [
+  {
+    name: "Philippine General Hospital (PGH)",
+    position: [14.5794, 120.9822],
+    specialty: "Cardiology, Emergency, Pediatrics",
+  },
+  {
+    name: "East Avenue Medical Center",
+    position: [14.6362, 121.0437],
+    specialty: "Neurology, Internal Medicine, Trauma Care",
+  },
+  {
+    name: "Rizal Medical Center",
+    position: [14.5641, 121.0713],
+    specialty: "Surgery, Obstetrics & Gynecology",
+  },
+  {
+    name: "Jose R. Reyes Memorial Medical Center",
+    position: [14.6155, 120.9843],
+    specialty: "Emergency, Neurosurgery, Pediatrics",
+  },
+  {
+    name: "St. Luke’s Medical Center (Quezon City)",
+    position: [14.6397, 121.0518],
+    specialty: "Cardiology, Orthopedics, Oncology",
+  },
 ];
 
+// 🧮 Function to simulate patient load per hospital
+const generateTriageData = () =>
+  hospitals.map((hospital) => {
+    const base = Math.floor(Math.random() * 60 + 80); // base patient count
+    return {
+      hospital: hospital.name,
+      low: Math.floor(base * 0.5),
+      medium: Math.floor(base * 0.2),
+      high: Math.floor(base * 0.15),
+      veryHigh: Math.floor(base * 0.1),
+      critical: Math.floor(base * 0.05),
+    };
+  });
+
 const TriageCard = () => {
+  const [triageData, setTriageData] = useState(generateTriageData());
+  const [userLocation, setUserLocation] = useState(null);
+
+  // 🔹 Track user location to simulate nearby updates
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+        },
+        () => {
+          setUserLocation([14.5995, 120.9842]); // Default: Manila
+        }
+      );
+    } else {
+      setUserLocation([14.5995, 120.9842]);
+    }
+  }, []);
+
+  // 🔄 Update triage data periodically (every 20s for demo)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTriageData(generateTriageData());
+    }, 20000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="card triage-card">
-      <h3 className="card-title">Triage System</h3>
+      <h3 className="card-title">
+        DOH Hospitals Triage System
+        {userLocation && (
+          <span style={{ fontSize: "0.8rem", color: "#666", marginLeft: "8px" }}>
+            (Based on your current location in Manila)
+          </span>
+        )}
+      </h3>
 
       <div className="triage-table-wrapper">
         <table className="triage-table">
           <thead>
             <tr>
-              <th>Evacuation Center</th>
+              <th>DOH Accredited Hospital</th>
               <th className="low">Low</th>
               <th className="medium">Medium</th>
               <th className="high">High</th>
@@ -28,7 +99,7 @@ const TriageCard = () => {
           <tbody>
             {triageData.map((row, i) => (
               <tr key={i}>
-                <td>{row.center}</td>
+                <td>{row.hospital}</td>
                 <td className="low">{row.low}</td>
                 <td className="medium">{row.medium}</td>
                 <td className="high">{row.high}</td>

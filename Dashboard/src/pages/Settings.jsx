@@ -174,7 +174,6 @@ const Settings = () => {
                   >
                     <option>English</option>
                     <option>Filipino</option>
-                    <option>Spanish</option>
                   </select>
                   <button className="save-btn" onClick={handleSave}>
                     <FaSave /> Save Changes

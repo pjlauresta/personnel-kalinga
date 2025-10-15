@@ -2457,3 +2457,90 @@ body {
 .save-btn:hover {
   background: #036c49;
 }
+/* Fix overflow and alignment */
+.leaflet-container {
+  width: 100% !important;
+  height: 95% !important;
+  border-radius: 10px;
+}
+
+.leaflet-control-attribution {
+  bottom: 2px !important;
+  right: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.card.reports-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+/* Page header (remove excessive space) */
+.page-header {
+  margin-top: 10px;      /* decreased from default (often 40px or more) */
+  margin-bottom: 10px;   /* tighten gap before triage card */
+  text-align: center;
+}
+
+/* Main title */
+.page-title {
+  font-size: 1.8rem;
+  color: #0a3a21;
+  margin: 0;             /* remove default margin */
+  padding: 0;
+  font-weight: 700;
+}
+
+/* Triage Card Wrapper */
+.triage-card {
+  margin-top: 5px;       /* reduce space between title and table */
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Optional: Make overall content area tighter */
+.content {
+  padding-top: 10px;     /* reduce gap under top bar */
+}
+/* Header Section */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 0 20px;
+}
+
+/* Title Left-Aligned */
+.page-title {
+  font-size: 1.8rem;
+  color: #0a3a21; /* DOH green */
+  font-weight: 700;
+  margin: 0;
+  text-align: left;
+}
+
+/* Dropdown Style (DOH theme) */
+.region-dropdown select {
+  background-color: #0a3a21; /* DOH green */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.region-dropdown select:hover {
+  background-color: #145c36; /* darker green on hover */
+}
+
+.region-dropdown select:focus {
+  outline: none;
+  background-color: #145c36;
+}

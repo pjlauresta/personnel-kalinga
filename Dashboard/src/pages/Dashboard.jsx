@@ -1,37 +1,44 @@
-import React from "react";
+// src/pages/Dashboard.jsx
+import React, { useState } from "react";
 import Layout from "../layouts/Layout";
 import DateRow from "../components/DateRow";
 import Cards from "../components/Cards";
 import Reports from "../components/Reports";
 import MapCard from "../components/MapCard";
 import ResourcesCard from "../components/ResourcesCard";
-import TriageCard from "../components/TriageCard"; // ✅ import triage
+import TriageCard from "../components/TriageCard";
 import Footer from "../components/Footer";
 
 const Dashboard = () => {
+  const [selectedCity, setSelectedCity] = useState("Metro Manila (All)");
+  const [selectedHospital, setSelectedHospital] = useState("All DOH Hospitals");
+
   return (
     <Layout>
-      <DateRow />
+      <DateRow
+        selectedCity={selectedCity}
+        selectedHospital={selectedHospital}
+        onCityChange={setSelectedCity}
+        onHospitalChange={setSelectedHospital}
+      />
+
       <Cards />
 
-      {/* Reports & Map side by side */}
       <div className="cards-grid mt-4">
-        <Reports />
-        <MapCard />
+        <Reports selectedHospital={selectedHospital} />
+        <MapCard selectedCity={selectedCity} selectedHospital={selectedHospital} />
       </div>
 
-      {/* ✅ Triage System placed here */}
       <div className="mt-4">
-        <TriageCard />
+        <TriageCard selectedHospital={selectedHospital} />
       </div>
 
-      {/* Resources */}
       <div className="mt-4">
         <ResourcesCard />
       </div>
 
       <Footer />
-    </Layout>  /* <-- kulang ito sa code mo */
+    </Layout>
   );
 };
 

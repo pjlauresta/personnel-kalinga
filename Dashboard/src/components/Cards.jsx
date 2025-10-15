@@ -1,7 +1,7 @@
 import React from "react";
 import WeatherCard from "../components/WeatherCard";
 import HealthRespondersCard from "../components/HealthRespondersCard";
-import PeopleShelteredCard from "../components/PeopleShelteredCard";
+import PeopleShelteredCard from "./HospitalPatientChart";
 import "../styles/personnel-style.css"; // reuse same css file
 
 const Cards = () => {

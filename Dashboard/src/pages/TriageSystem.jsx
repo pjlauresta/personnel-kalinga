@@ -5,45 +5,50 @@ import "../styles/personnel-style.css";
 import Footer from "../components/Footer";
 
 const TriageSystem = () => {
-  const [selectedLocation, setSelectedLocation] = useState("Location 1");
+  const [selectedArea, setSelectedArea] = useState("Metro Manila");
 
-  const locations = ["Location 1", "Location 2", "Location 3", "Location 4", "Location 5"];
+  const areas = ["Metro Manila", "North Luzon", "South Luzon", "Visayas", "Mindanao"];
 
   const data = {
-    "Location 1": [
-      { center: "Evacuation Center 1", values: [124, 4, 28, 32, 1] },
-      { center: "Evacuation Center 2", values: [102, 56, 58, 43, 10] },
-      { center: "Evacuation Center 3", values: [73, 34, 58, 30, 4] },
-      { center: "Evacuation Center 4", values: [55, 50, 58, 88, 12] },
+    "Metro Manila": [
+      { hospital: "Philippine Heart Center", values: [25, 12, 4, 3, 1] },
+      { hospital: "East Avenue Medical Center", values: [40, 18, 10, 5, 2] },
+      { hospital: "Jose Reyes Memorial Medical Center", values: [32, 14, 6, 4, 1] },
+      { hospital: "San Lazaro Hospital", values: [28, 20, 9, 2, 0] },
     ],
-    "Location 2": [
-      { center: "Evacuation Center A", values: [90, 30, 22, 15, 2] },
-      { center: "Evacuation Center B", values: [110, 44, 32, 28, 6] },
-      { center: "Evacuation Center C", values: [65, 25, 30, 40, 5] },
+    "North Luzon": [
+      { hospital: "Baguio General Hospital", values: [38, 10, 5, 2, 1] },
+      { hospital: "Ilocos Training & Regional Medical Center", values: [25, 12, 6, 2, 1] },
     ],
-    "Location 3": [
-      { center: "Evacuation Hub 1", values: [120, 35, 40, 22, 8] },
-      { center: "Evacuation Hub 2", values: [75, 20, 15, 10, 1] },
+    "South Luzon": [
+      { hospital: "Batangas Medical Center", values: [45, 22, 10, 6, 2] },
+      { hospital: "Bicol Regional Hospital", values: [30, 15, 8, 5, 2] },
     ],
-    "Location 4": [
-      { center: "Safe Zone 1", values: [95, 15, 20, 12, 4] },
-      { center: "Safe Zone 2", values: [80, 18, 25, 30, 7] },
+    "Visayas": [
+      { hospital: "Vicente Sotto Memorial Medical Center", values: [40, 18, 9, 4, 1] },
+      { hospital: "Western Visayas Medical Center", values: [32, 14, 6, 3, 0] },
     ],
-    "Location 5": [
-      { center: "Relief Center 1", values: [140, 20, 18, 25, 3] },
-      { center: "Relief Center 2", values: [60, 22, 19, 15, 6] },
+    "Mindanao": [
+      { hospital: "Southern Philippines Medical Center", values: [60, 20, 15, 6, 3] },
+      { hospital: "Northern Mindanao Medical Center", values: [35, 18, 9, 5, 2] },
     ],
   };
 
   const alerts = [
-    { text: "Evacuation Center 1 - Location 3 has reached max capacity for critical cases (15 individuals). Immediate medical support needed.", level: "critical" },
-    { text: "4 unconscious individuals reported at Evacuation Center 2, Location 1.", level: "critical" },
+    {
+      text: "Philippine Heart Center currently lacks <b>cardiologists</b> for new critical cases. Patients will be redirected to East Avenue Medical Center.",
+      level: "critical",
+    },
+    {
+      text: "Jose Reyes Memorial Medical Center reports a <b>surge in neurology cases</b>. Requesting additional neurologists from nearby facilities.",
+      level: "veryHigh",
+    },
   ];
 
   const highlights = [
-    { text: "Medium vulnerability cases at Location 2 have doubled in the last 3 hours.", level: "medium" },
-    { text: "Surge in High severity cases among elderly in Center 1, Location 3.", level: "high" },
-    { text: "Location 3 shows consistent spike in Critical and Very High levels across all centers.", level: "veryHigh" },
+    { text: "<b>High severity</b> respiratory cases rising at San Lazaro Hospital.", level: "high" },
+    { text: "East Avenue Medical Center shows <b>increased orthopedic admissions</b>.", level: "medium" },
+    { text: "Philippine Heart Center remains at <b>maximum ICU capacity</b>.", level: "critical" },
   ];
 
   const badge = {
@@ -58,34 +63,33 @@ const TriageSystem = () => {
     <Layout>
       <div className="content">
 
-        {/* === PAGE TITLE === */}
+        {/* === PAGE HEADER === */}
         <div className="page-header">
-          <h1 className="page-title">Triage System</h1>
-        </div>
-
-        {/* === TRIAGE CARD === */}
-        <div className="triage-card">
-          <div className="triage-header">
-            <h2 className="triage-title">{selectedLocation}</h2>
+          <h2 className="page-title">DOH Hospital Triage & Specialist Tracking</h2>
+          <div className="region-dropdown">
             <select
-              className="triage-dropdown"
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
+              value={selectedArea}
+              onChange={(e) => setSelectedArea(e.target.value)}
             >
-              {locations.map((loc, i) => (
-                <option key={i} value={loc}>
-                  {loc}
+              {areas.map((area, i) => (
+                <option key={i} value={area}>
+                  {area}
                 </option>
               ))}
             </select>
           </div>
+        </div>
+
+        {/* === TRIAGE CARD === */}
+        <div className="triage-card">
+          <h2 className="triage-title">{selectedArea}</h2>
 
           {/* TABLE WRAPPER */}
           <div className="table-container">
             <table className="triage-table">
               <thead>
                 <tr>
-                  <th>Evacuation Center</th>
+                  <th>DOH Hospital</th>
                   <th>Low</th>
                   <th>Medium</th>
                   <th>High</th>
@@ -94,9 +98,9 @@ const TriageSystem = () => {
                 </tr>
               </thead>
               <tbody>
-                {data[selectedLocation].map((row, idx) => (
+                {data[selectedArea].map((row, idx) => (
                   <tr key={idx}>
-                    <td>{row.center}</td>
+                    <td>{row.hospital}</td>
                     <td className="cell low">{row.values[0]}</td>
                     <td className="cell medium">{row.values[1]}</td>
                     <td className="cell high">{row.values[2]}</td>
@@ -110,30 +114,30 @@ const TriageSystem = () => {
 
           {/* === LEGEND === */}
           <div className="legend">
-            <div className="legend-item">{badge.low}</div>
-            <div className="legend-item">{badge.medium}</div>
-            <div className="legend-item">{badge.high}</div>
-            <div className="legend-item">{badge.veryHigh}</div>
-            <div className="legend-item">{badge.critical}</div>
+            {Object.values(badge).map((b, i) => (
+              <div key={i} className="legend-item">{b}</div>
+            ))}
           </div>
         </div>
 
-        {/* === CRITICAL ALERTS === */}
+        {/* === ALERTS === */}
         <div className="alerts-card">
-          <h3>Critical Case Alerts</h3>
+          <h3>Specialist Availability Alerts</h3>
           {alerts.map((a, i) => (
             <div key={i} className="alert-item">
-              <span className={`badge ${a.level}`}>{badge[a.level]}</span> {a.text}
+              <span className={`badge ${a.level}`}>{badge[a.level]}</span>{" "}
+              <span dangerouslySetInnerHTML={{ __html: a.text }} />
             </div>
           ))}
         </div>
 
-        {/* === REAL-TIME HIGHLIGHTS === */}
+        {/* === HIGHLIGHTS === */}
         <div className="highlights-card">
-          <h3>Real-Time Highlights</h3>
+          <h3>Real-Time Hospital Highlights</h3>
           {highlights.map((h, i) => (
             <div key={i} className="highlight-item">
-              <span className={`badge ${h.level}`}>{badge[h.level]}</span> {h.text}
+              <span className={`badge ${h.level}`}>{badge[h.level]}</span>{" "}
+              <span dangerouslySetInnerHTML={{ __html: h.text }} />
             </div>
           ))}
         </div>

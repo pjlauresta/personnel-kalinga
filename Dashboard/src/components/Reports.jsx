@@ -1,46 +1,61 @@
 import React from "react";
-import { FaExclamationTriangle, FaHome } from "react-icons/fa";
+import { FaExclamationTriangle, FaUserMd } from "react-icons/fa";
 import "../styles/personnel-style.css"; // Custom card styles
 
 const Reports = () => {
-  // 🔹 Data-driven alerts (easier to maintain)
-  const immediateAlerts = [
-    "Evacuation Center 1 is near full capacity. Assign additional resources.",
-    "Aftershocks reported. Conduct safety checks in nearby facilities.",
-    "Floodwater subsiding. Initiate sanitation measures in affected areas.",
+  // 🔹 DOH hospital-focused alerts (Metro Manila)
+  const hospitalAlerts = [
+    "Philippine General Hospital (PGH) is nearing **full capacity** in the Emergency Department. Prepare for **patient redirection**.",
+    "East Avenue Medical Center ICU occupancy at **92%**. Coordinate **overflow arrangements**.",
+    "Rizal Medical Center reports **limited oxygen supply**. Request **urgent replenishment**.",
+    "National Children’s Hospital **NICU nearing full capacity**. Redirect overflow to **PGH Pediatrics Department**.",
   ];
 
-  const resourceAlerts = [
-    "Evacuation Center 1 requires additional staff deployment.",
-    "Evacuation Center 2 needs logistics for food distribution.",
-    "Evacuation Center 3 requires additional staff personnel.",
+  // 🔹 Specialist availability and redirection suggestions
+  const specialistAlerts = [
+    "PGH currently lacks available **Cardiologists**. Redirect cardiac patients to **St. Luke’s Medical Center (Quezon City)**.",
+    "Jose R. Reyes Memorial Medical Center has no **Neurologists** on duty. Redirect critical cases to **East Avenue Medical Center**.",
+    "Manila Doctors Hospital **Orthopedic team on rotation leave**. Transfer trauma cases to **Rizal Medical Center**.",
+    "Ospital ng Maynila requires additional **Pediatricians**. Coordinate support from **National Children’s Hospital**.",
   ];
+
+  // 🔹 Helper to render alerts with bold parts
+  const renderAlert = (text) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g); // Split text where bold markers are found
+    return parts.map((part, i) =>
+      part.startsWith("**") && part.endsWith("**") ? (
+        <strong key={i}>{part.slice(2, -2)}</strong>
+      ) : (
+        part
+      )
+    );
+  };
 
   return (
     <div className="card reports-card">
-      <h3 className="card-title"> Reports</h3>
+      <h3 className="card-title">DOH Hospital Reports</h3>
 
-      {/* Immediate Alerts */}
+      {/* Hospital Alerts */}
       <div className="section">
-        <h4 className="section-title"> Immediate Alerts</h4>
+        <h4 className="section-title">Hospital Capacity Alerts</h4>
         <ul className="list">
-          {immediateAlerts.map((alert, i) => (
+          {hospitalAlerts.map((alert, i) => (
             <li key={i}>
               <FaExclamationTriangle className="icon warning" />
-              <span>{alert}</span>
+              <span>{renderAlert(alert)}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      {/* Resource Alerts */}
+      {/* Specialist Alerts */}
       <div className="section">
-        <h4 className="section-title"> Resource Alerts</h4>
+        <h4 className="section-title">Specialist Availability</h4>
         <ul className="list">
-          {resourceAlerts.map((alert, i) => (
+          {specialistAlerts.map((alert, i) => (
             <li key={i}>
-              <FaHome className="icon resource" />
-              <span>{alert}</span>
+              <FaUserMd className="icon resource" />
+              <span>{renderAlert(alert)}</span>
             </li>
           ))}
         </ul>

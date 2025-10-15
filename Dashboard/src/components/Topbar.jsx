@@ -1,4 +1,3 @@
-// src/components/Topbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import {
   FaBell,
@@ -7,7 +6,7 @@ import {
   FaUser,
   FaCog,
   FaSignOutAlt,
-  FaGraduationCap,   // ✅ Import an icon for Grades
+  FaGraduationCap,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -29,10 +28,23 @@ const Topbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Handle navigation
+  // ✅ Navigation handler
   const handleNavigate = (path) => {
     navigate(path);
-    setMenuOpen(false); // close dropdown after click
+    setMenuOpen(false);
+  };
+
+  // ✅ Logout handler
+  const handleLogout = () => {
+    // Clear any stored user session data
+    localStorage.clear();
+    sessionStorage.clear();
+
+    alert("You have been logged out.");
+    setMenuOpen(false);
+
+    // Redirect to login or homepage
+    navigate("/login"); // ← change to "/" if you want to go to homepage
   };
 
   return (
@@ -77,15 +89,11 @@ const Topbar = () => {
                     <li onClick={() => handleNavigate("/settings")}>
                       <FaCog className="menu-icon" /> Settings
                     </li>
-                    {/* ✅ NEW: Grades Tab */}
                     <li onClick={() => handleNavigate("/grades")}>
-  <FaUser className="menu-icon" /> Grades
-</li>
-
-                    <li
-                      className="logout"
-                      onClick={() => alert("Logging out...")}
-                    >
+                      <FaGraduationCap className="menu-icon" /> Grades
+                    </li>
+                    {/* ✅ Logout now actually logs the user out */}
+                    <li className="logout" onClick={handleLogout}>
                       <FaSignOutAlt className="menu-icon" /> Logout
                     </li>
                   </ul>

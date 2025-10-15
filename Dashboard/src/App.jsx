@@ -12,10 +12,11 @@ import Modules from "./pages/Online/Modules";
 import Certifications from "./pages/Online/Certifications";
 import Settings from "./pages/Settings";
 import IncidentLogs from "./pages/IncidentLogs";
-import CourseDetails from "./pages/Online/CourseDetails"; 
-import LessonDetails from "./pages/Online/LessonDetails"; // ✅ NEW
+import CourseDetails from "./pages/Online/CourseDetails";
+import InfoPage from "./pages/Online/InfoPage";
+import LessonDetails from "./pages/Online/LessonDetails";
 import AssessmentPage from "./pages/Online/AssessmentPage";
-import Grades from "./pages/Grades"; 
+import Grades from "./pages/Grades";
 import Profile from "./pages/Profile";
 
 // PrivateRoute wrapper
@@ -28,22 +29,92 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public route */}
+        {/* 🟢 Public Route */}
         <Route path="/login" element={<KalingaAuthSystem />} />
 
-        {/* Private routes */}
-        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-        <Route path="/incident-logs" element={<PrivateRoute><IncidentLogs /></PrivateRoute>} />
-        <Route path="/emergency-sos" element={<PrivateRoute><EmergencySOS /></PrivateRoute>} />
-        <Route path="/triage-system" element={<PrivateRoute><TriageSystem /></PrivateRoute>} />
-        <Route path="/online-training" element={<PrivateRoute><OnlineTraining /></PrivateRoute>} />
-        <Route path="/modules" element={<PrivateRoute><Modules /></PrivateRoute>} />
-        <Route path="/certifications" element={<PrivateRoute><Certifications /></PrivateRoute>} />
-        <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-        <Route path="/grades" element={<PrivateRoute><Grades /></PrivateRoute>} />
-        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        {/* 🟢 Private Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/incident-logs"
+          element={
+            <PrivateRoute>
+              <IncidentLogs />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/emergency-sos"
+          element={
+            <PrivateRoute>
+              <EmergencySOS />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/triage-system"
+          element={
+            <PrivateRoute>
+              <TriageSystem />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/online-training"
+          element={
+            <PrivateRoute>
+              <OnlineTraining />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/modules"
+          element={
+            <PrivateRoute>
+              <Modules />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/certifications"
+          element={
+            <PrivateRoute>
+              <Certifications />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/grades"
+          element={
+            <PrivateRoute>
+              <Grades />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
 
-        {/* Courses & Course Details */}
+        {/* 🧾 Course Main Page */}
         <Route
           path="/modules/:id"
           element={
@@ -53,14 +124,19 @@ function App() {
           }
         />
 
+        {/* 🧠 Info Page (General / Helpful Materials) */}
         <Route
-          path="/modules/:id/info/:sectionSlug/:topicSlug"
-          element={<h1>InfoPage working!</h1>}
+          path="/modules/:id/info/:topicSlug"
+          element={
+            <PrivateRoute>
+              <InfoPage />
+            </PrivateRoute>
+          }
         />
 
-        {/* ✅ Lesson Details (new) */}
+        {/* 🎥 Lesson Details (Training Materials - Lessons & Modules) */}
         <Route
-          path="/modules/:id/activity/:activitySlug"
+          path="/modules/:id/lesson/:lessonSlug"
           element={
             <PrivateRoute>
               <LessonDetails />
@@ -68,7 +144,7 @@ function App() {
           }
         />
 
-        {/* Assessments */}
+        {/* 📝 Assessments (Pre-Test, Quiz, Final Assessment) */}
         <Route
           path="/modules/:id/assessment/:type"
           element={
@@ -78,7 +154,7 @@ function App() {
           }
         />
 
-        {/* Default redirect */}
+        {/* 🏁 Default Redirect */}
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

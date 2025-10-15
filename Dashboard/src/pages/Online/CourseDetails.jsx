@@ -1,4 +1,3 @@
-// src/pages/Online/CourseDetails.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Layout from "../../layouts/Layout";
@@ -8,6 +7,7 @@ import {
   FaBook,
   FaClipboardList,
   FaPlayCircle,
+  FaLock,
 } from "react-icons/fa";
 import "../../styles/courseDetails.css";
 
@@ -21,21 +21,20 @@ const getProgress = () =>
     trainingMaterials: [],
   };
 
-const markLessonComplete = (section, lessonId) => {
+const markLessonComplete = (section, lessonId, setProgress) => {
   const progress = getProgress();
   if (!progress[section].includes(lessonId)) {
     progress[section].push(lessonId);
     localStorage.setItem("courseProgress", JSON.stringify(progress));
+    setProgress({ ...progress });
   }
 };
 
-const isSectionComplete = (section, totalLessons) => {
-  const progress = getProgress();
-  return progress[section].length >= totalLessons;
-};
+const slugify = (text) =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 // ----------------------
-// 🔹 All Courses Data (1–12)
+// 🔹 Courses Data
 // ----------------------
 const allCourses = {
   "1": {
@@ -45,18 +44,17 @@ const allCourses = {
         heading: "General Information",
         items: [
           "Welcome Message",
-          "Course Overview & Objectives",
-          "Training Flow & Requirements",
-          "Facilitator’s Guide Outline",
+          "Program Overview",
+          "Objectives",
+          "Implementation Strategies",
         ],
       },
       {
-        heading: "Helpful Material",
+        heading: "Helpful Materials",
         items: [
-          "Reference Materials",
-          "Nutrition Policy Documents",
-          "Community Tools & Templates",
-          "Sample Session Plans",
+          "Community Guidelines",
+          "Frequently Asked Questions (FAQs)",
+          "Technical Assistance Contacts",
         ],
       },
       {
@@ -78,6 +76,7 @@ const allCourses = {
       },
     ],
   },
+
   "2": {
     title: "DOH Integrated People-Centered Health Services",
     sections: [
@@ -101,6 +100,7 @@ const allCourses = {
       },
     ],
   },
+
   "3": {
     title: "Integrated Course on Primary Care",
     sections: [
@@ -124,261 +124,234 @@ const allCourses = {
       },
     ],
   },
-    "4": {
-      title:
-        "Introduction to Seven Major Recommendations to Prevent Tuberculosis Transmission",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "Background", "Learning Outcomes"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["TB Prevention Toolkit", "DOH & WHO Guidelines"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Overview of TB Transmission",
-            "Module 2: Seven Core Recommendations Explained",
-            "Module 3: Implementing TB Prevention Measures",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
 
-    "5": {
-      title: "Healthy Hearts Technical Package",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Introduction", "Program Goals", "Heart Health Basics"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["Healthy Hearts Toolkit", "Cardiovascular Guidelines"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Understanding Cardiovascular Risk Factors",
-            "Module 2: Implementing HEARTS Interventions",
-            "Module 3: Monitoring & Evaluation Framework",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "4": {
+    title:
+      "Introduction to Seven Major Recommendations to Prevent Tuberculosis Transmission",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Welcome", "Background", "Learning Outcomes"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["TB Prevention Toolkit", "DOH & WHO Guidelines"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Overview of TB Transmission",
+          "Module 2: Seven Core Recommendations Explained",
+          "Module 3: Implementing TB Prevention Measures",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "6": {
-      title:
-        "Basic Course in Family Planning Final Exam and Certificate of Training",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Overview", "Course Objectives", "Accreditation Details"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["FP Handbook", "Clinical Protocols", "Service Delivery Tools"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Family Planning Concepts",
-            "Module 2: Counseling and Client-Centered Approach",
-            "Module 3: FP Commodities and Logistics",
-            "Module 4: Program Management and Reporting",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "5": {
+    title: "Healthy Hearts Technical Package",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Introduction", "Program Goals", "Heart Health Basics"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["Healthy Hearts Toolkit", "Cardiovascular Guidelines"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Understanding Cardiovascular Risk Factors",
+          "Module 2: Implementing HEARTS Interventions",
+          "Module 3: Monitoring & Evaluation Framework",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "7": {
-      title: "Nutrition Care Process for Clinical Nutritionist Dietitians",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Introduction", "Purpose of the Course", "Expected Outcomes"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["NCP Reference Guide", "Sample Nutrition Plans"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Nutrition Assessment and Diagnosis",
-            "Module 2: Intervention and Monitoring",
-            "Module 3: Documentation and Evaluation",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "6": {
+    title:
+      "Basic Course in Family Planning Final Exam and Certificate of Training",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Overview", "Course Objectives", "Accreditation Details"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["FP Handbook", "Clinical Protocols", "Service Delivery Tools"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Family Planning Concepts",
+          "Module 2: Counseling and Client-Centered Approach",
+          "Module 3: FP Commodities and Logistics",
+          "Module 4: Program Management and Reporting",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "8": {
-      title:
-        "Basic Life Support Online Training - Didactic [NCMH - 2025 BATCH 10]",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "Course Requirements", "Completion Criteria"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["BLS Manual", "CPR Flowchart", "AED Use Guidelines"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Basic Life Support Principles",
-            "Lesson 1: Adult & Pediatric CPR",
-            "Lesson 2: AED Operation",
-            "Lesson 3: Airway Management",
-            "Quiz",
-            "Module 2: Emergency Response",
-            "Lesson 1: Scene Safety & Assessment",
-            "Lesson 2: Post-Resuscitation Care",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "7": {
+    title: "Nutrition Care Process for Clinical Nutritionist Dietitians",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Introduction", "Purpose of the Course", "Expected Outcomes"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["NCP Reference Guide", "Sample Nutrition Plans"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Nutrition Assessment and Diagnosis",
+          "Module 2: Intervention and Monitoring",
+          "Module 3: Documentation and Evaluation",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "9": {
-      title: "Basic Course on Continuous Quality Improvement for Health Facilities",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Overview", "Course Objectives", "QI Principles"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["CQI Toolkit", "Performance Indicators", "Case Studies"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Understanding QI Concepts",
-            "Module 2: Data-Driven Improvement",
-            "Module 3: Implementing CQI Cycles",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "8": {
+    title:
+      "Basic Life Support Online Training - Didactic [NCMH - 2025 BATCH 10]",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Welcome", "Course Requirements", "Completion Criteria"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["BLS Manual", "CPR Flowchart", "AED Use Guidelines"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Basic Life Support Principles",
+          "Lesson 1: Adult & Pediatric CPR",
+          "Lesson 2: AED Operation",
+          "Lesson 3: Airway Management",
+          "Quiz",
+          "Module 2: Emergency Response",
+          "Lesson 1: Scene Safety & Assessment",
+          "Lesson 2: Post-Resuscitation Care",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "10": {
-      title: "Data to Policy Competency 1 - Problem Statement",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "Competency Overview", "Learning Objectives"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["Policy Brief Templates", "Data Analysis Tools"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Understanding the Policy Process",
-            "Module 2: Identifying and Framing Problems",
-            "Module 3: Crafting Evidence-Based Policy Statements",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "9": {
+    title:
+      "Basic Course on Continuous Quality Improvement for Health Facilities",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Overview", "Course Objectives", "QI Principles"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["CQI Toolkit", "Performance Indicators", "Case Studies"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Understanding QI Concepts",
+          "Module 2: Data-Driven Improvement",
+          "Module 3: Implementing CQI Cycles",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "11": {
-      title:
-        "Orientation on Navigating the Continuing Professional Accreditation System (CPDAS)",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "System Overview", "User Roles and Access"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["CPDAS User Guide", "Accreditation FAQs"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Accessing the CPDAS Portal",
-            "Module 2: Managing Accreditation Records",
-            "Module 3: Uploading Certificates and Evaluations",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
+  "10": {
+    title: "Data to Policy Competency 1 - Problem Statement",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Welcome", "Competency Overview", "Learning Objectives"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["Policy Brief Templates", "Data Analysis Tools"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Understanding the Policy Process",
+          "Module 2: Identifying and Framing Problems",
+          "Module 3: Crafting Evidence-Based Policy Statements",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-    "12": {
-      title: "Laboratory Quality Management System Online Training",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "Course Introduction", "Quality System Essentials"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["LQMS Manual", "Documentation Templates", "WHO Standards"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Introduction to Quality Management",
-            "Module 2: Laboratory Process Control",
-            "Module 3: Internal Audits & Corrective Actions",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
-  };
+  "11": {
+    title:
+      "Orientation on Navigating the Continuing Professional Accreditation System (CPDAS)",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Welcome", "System Overview", "User Roles and Access"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["CPDAS User Guide", "Accreditation FAQs"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Accessing the CPDAS Portal",
+          "Module 2: Managing Accreditation Records",
+          "Module 3: Uploading Certificates and Evaluations",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
 
-
+  "12": {
+    title: "Laboratory Quality Management System Online Training",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Welcome", "Course Introduction", "Quality System Essentials"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["LQMS Manual", "Documentation Templates", "WHO Standards"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Introduction to Quality Management",
+          "Module 2: Laboratory Process Control",
+          "Module 3: Internal Audits & Corrective Actions",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
+};
 // ----------------------
 // 🔹 Component
 // ----------------------
@@ -391,10 +364,6 @@ const CourseDetails = () => {
     setProgress(getProgress());
   }, []);
 
-  const updateProgress = () => {
-    setProgress(getProgress());
-  };
-
   const getIcon = (heading) => {
     if (heading.includes("General"))
       return <FaInfoCircle className="text-green-700 text-2xl" />;
@@ -405,12 +374,6 @@ const CourseDetails = () => {
     return <FaClipboardList className="text-green-700 text-2xl" />;
   };
 
-  const slugify = (text) =>
-    text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-
-  // ---------------------------
-  // 🔸 If no course is selected
-  // ---------------------------
   if (!id) {
     return (
       <Layout>
@@ -452,52 +415,82 @@ const CourseDetails = () => {
       </Layout>
     );
 
-  if (!course.sections) {
-    return (
-      <Layout>
-        <div className="course-wrapper">
-          <h1 className="course-title">{course.title}</h1>
-          <p className="text-gray-600">
-            Training materials for this course are not yet available.
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-4 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800"
-          >
-            Back
-          </button>
-        </div>
-        <Footer />
-      </Layout>
-    );
-  }
-
-  // ---------------------------
-  // 🔸 Progressive Section Unlock Logic
-  // ---------------------------
+  // -------------------------
+  // 🔹 Strict Section Unlock
+  // -------------------------
   const totalLessons = {
     generalInfo: course.sections[0]?.items.length || 0,
     helpfulMaterials: course.sections[1]?.items.length || 0,
     trainingMaterials: course.sections[2]?.items.length || 0,
   };
 
-  const generalDone = isSectionComplete("generalInfo", totalLessons.generalInfo);
-  const helpfulDone = isSectionComplete(
-    "helpfulMaterials",
-    totalLessons.helpfulMaterials
-  );
+  const generalDone = progress.generalInfo.length >= totalLessons.generalInfo;
+  const helpfulDone =
+    progress.helpfulMaterials.length >= totalLessons.helpfulMaterials;
 
   const sectionUnlocked = (heading) => {
-    if (heading.includes("General")) return true; // Always open
-    if (heading.includes("Helpful")) return generalDone; // Unlock after General done
-    if (heading.includes("Training"))
-      return generalDone && helpfulDone; // Unlock after Helpful done
+    if (heading.includes("General")) return true;
+    if (heading.includes("Helpful")) return generalDone;
+    if (heading.includes("Training")) return generalDone && helpfulDone;
     return false;
   };
 
-  // ---------------------------
-  // 🔸 UI Rendering
-  // ---------------------------
+  // -------------------------
+  // 🔹 Strict Item Unlock
+  // -------------------------
+  const itemUnlocked = (section, itemIndex) => {
+    const sectionKey = section.heading.includes("General")
+      ? "generalInfo"
+      : section.heading.includes("Helpful")
+      ? "helpfulMaterials"
+      : "trainingMaterials";
+
+    const completedItems = progress[sectionKey];
+    // unlock first item or if the previous one is completed
+    return (
+      itemIndex === 0 ||
+      completedItems.includes(section.items[itemIndex - 1])
+    );
+  };
+
+  // -------------------------
+  // 🔹 Navigation
+  // -------------------------
+  const handleItemClick = (section, item, index) => {
+    if (!sectionUnlocked(section.heading)) {
+      alert("Please complete the previous section first.");
+      return;
+    }
+
+    if (!itemUnlocked(section, index)) {
+      alert("Please complete the previous lesson before proceeding.");
+      return;
+    }
+
+    const slug = slugify(item);
+
+    if (section.heading.includes("Training")) {
+      if (item === "Pre-Test")
+        navigate(`/modules/${id}/assessment/pre-test`);
+      else if (item === "Quiz")
+        navigate(`/modules/${id}/assessment/quiz`);
+      else if (item === "Final Assessment")
+        navigate(`/modules/${id}/assessment/final-assessment`);
+      else navigate(`/modules/${id}/lesson/${slug}`);
+
+      markLessonComplete("trainingMaterials", item, setProgress);
+    } else if (section.heading.includes("General")) {
+      navigate(`/modules/${id}/info/${slug}`);
+      markLessonComplete("generalInfo", item, setProgress);
+    } else if (section.heading.includes("Helpful")) {
+      navigate(`/modules/${id}/info/${slug}`);
+      markLessonComplete("helpfulMaterials", item, setProgress);
+    }
+  };
+
+  // -------------------------
+  // 🔹 Render
+  // -------------------------
   return (
     <Layout>
       <div className="course-wrapper">
@@ -507,6 +500,7 @@ const CourseDetails = () => {
         <div className="space-y-6">
           {course.sections.map((section, idx) => {
             const unlocked = sectionUnlocked(section.heading);
+
             return (
               <div
                 key={idx}
@@ -519,40 +513,40 @@ const CourseDetails = () => {
                   <span className="course-heading-text">
                     {section.heading}
                     {!unlocked && (
-                      <span className="ml-2 text-sm text-gray-500">
-                        (Locked)
+                      <span className="ml-2 flex items-center text-sm text-gray-500">
+                        <FaLock className="mr-1" /> Locked
                       </span>
                     )}
                   </span>
                 </div>
 
-                {!unlocked && (
-                  <p className="text-sm text-gray-500 mt-2 ml-5">
-                    🔒 Complete the previous section to unlock this content.
-                  </p>
-                )}
-
                 {unlocked && (
                   <div className="course-items">
                     {section.items.map((item, i) => {
-                      const url = `/modules/${id}/activity/${slugify(item)}`;
+                      const completed =
+                        progress.generalInfo.includes(item) ||
+                        progress.helpfulMaterials.includes(item) ||
+                        progress.trainingMaterials.includes(item);
+
+                      const canAccess = itemUnlocked(section, i);
+
                       return (
-                        <div key={i} className="course-subitem">
-                          <Link
-                            to={url}
-                            onClick={() => {
-                              if (section.heading.includes("General"))
-                                markLessonComplete("generalInfo", item);
-                              if (section.heading.includes("Helpful"))
-                                markLessonComplete("helpfulMaterials", item);
-                              if (section.heading.includes("Training"))
-                                markLessonComplete("trainingMaterials", item);
-                              updateProgress();
-                            }}
-                            className="text-green-700 hover:underline font-semibold"
-                          >
-                            {item}
-                          </Link>
+                        <div
+                          key={i}
+                          className={`course-subitem flex justify-between items-center font-semibold ${
+                            canAccess
+                              ? "text-green-700 cursor-pointer hover:underline"
+                              : "text-gray-400 cursor-not-allowed"
+                          } ${completed ? "text-green-500" : ""}`}
+                          onClick={() =>
+                            canAccess && handleItemClick(section, item, i)
+                          }
+                        >
+                          <span>{item}</span>
+                          {completed && <span>✓</span>}
+                          {!completed && !canAccess && (
+                            <FaLock className="text-gray-400 ml-2" />
+                          )}
                         </div>
                       );
                     })}

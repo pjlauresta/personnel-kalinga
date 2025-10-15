@@ -6,7 +6,6 @@ import courseContent from "../../data/courseContent";
 import "../../styles/lessonDetails.css";
 import { markLessonComplete } from "../../lib/progressUtils";
 
-
 const slugify = (text = "") =>
   text
     .toString()
@@ -16,23 +15,8 @@ const slugify = (text = "") =>
     .replace(/[\s\W-]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const handleMarkComplete = () => {
-  markLessonComplete(id, current.slug); // ✅ id = courseId
-
-  const updated = [...completedLessons, current.slug];
-  setCompletedLessons(updated);
-
-  alert(`✅ You completed: ${current.title}`);
-
-  // Go to next lesson or unlock next section
-  if (updated.length === activities.length) {
-    setTimeout(() => navigate(`/modules/${id}`), 600);
-  }
-};
-
-
 export default function LessonDetails() {
-  const { id, activitySlug } = useParams(); // route: /modules/:id/activity/:activitySlug
+  const { id, activitySlug } = useParams();
   const navigate = useNavigate();
 
   const course = courseContent[id];
@@ -48,28 +32,64 @@ export default function LessonDetails() {
     );
   }
 
+  // ✅ Always include a requiredTime (default 10 seconds)
   const activities = useMemo(
     () =>
-      (course.sections || []).map((title) => ({
-        title,
-        slug: slugify(title),
-      })),
+      (course.sections || []).map((section) => {
+        if (typeof section === "string") {
+          return { title: section, slug: slugify(section), requiredTime: 10 };
+        } else {
+          return {
+            title: section.title,
+            slug: slugify(section.title),
+            requiredTime: section.requiredTime ?? 10,
+          };
+        }
+      }),
     [course]
   );
 
-  const idx = activitySlug ? activities.findIndex((a) => a.slug === activitySlug) : -1;
+  const idx = activitySlug
+    ? activities.findIndex((a) => a.slug === activitySlug)
+    : -1;
   const activeIndex = idx === -1 ? 0 : idx;
   const current = activities[activeIndex];
   const pdfUrl = `/assets/lessons/${id}/${current.slug}.pdf`;
 
-  // ✅ Completion state
   const progressKey = `course-progress-${id}`;
   const [completedLessons, setCompletedLessons] = useState([]);
+  const [waitTime, setWaitTime] = useState(current.requiredTime || 10);
+  const [isWaiting, setIsWaiting] = useState(true);
 
+  // ✅ Timer logic: force at least 10s stay per lesson
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(progressKey)) || [];
     setCompletedLessons(saved);
-  }, [id]);
+    setWaitTime(current.requiredTime || 10);
+    setIsWaiting(true);
+
+    let timer;
+    const timeLimit = current.requiredTime ?? 10;
+
+    // if already completed or training materials
+    if (timeLimit === 0 || saved.includes(current.slug)) {
+      setIsWaiting(false);
+      setWaitTime(0);
+    } else {
+      timer = setInterval(() => {
+        setWaitTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setIsWaiting(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [id, activitySlug]);
 
   const handleMarkComplete = () => {
     const saved = JSON.parse(localStorage.getItem(progressKey)) || [];
@@ -80,17 +100,23 @@ export default function LessonDetails() {
       alert(`✅ You have completed: ${current.title}`);
     }
 
-    // If all lessons completed → redirect to assessment
+    // Redirect to assessment or next lesson
     if (completedLessons.length + 1 === activities.length) {
+      setTimeout(() => navigate(`/assessment/${id}`), 600);
+    } else {
       setTimeout(() => {
-        navigate(`/assessment/${id}`);
+        if (activeIndex < activities.length - 1) {
+          navigate(`/modules/${id}/activity/${activities[activeIndex + 1].slug}`);
+        }
       }, 600);
     }
   };
 
   const handlePrev = () => {
-    if (activeIndex > 0) navigate(`/modules/${id}/activity/${activities[activeIndex - 1].slug}`);
+    if (activeIndex > 0)
+      navigate(`/modules/${id}/activity/${activities[activeIndex - 1].slug}`);
   };
+
   const handleNext = () => {
     if (activeIndex < activities.length - 1)
       navigate(`/modules/${id}/activity/${activities[activeIndex + 1].slug}`);
@@ -118,7 +144,7 @@ export default function LessonDetails() {
           <span className="muted">{current.title}</span>
         </div>
 
-        {/* Title area */}
+        {/* Header */}
         <div className="lesson-header">
           <h1 className="lesson-course-title">{course.title}</h1>
           <h3 className="lesson-activity-title">{current.title}</h3>
@@ -140,25 +166,39 @@ export default function LessonDetails() {
           </a>
         </div>
 
-        {/* ✅ Mark as complete */}
+        {/* ✅ Mark Complete Section */}
         <div className="completion-wrapper">
-          <button
-            onClick={handleMarkComplete}
-            className={`btn ${isCompleted ? "btn-disabled" : "btn-success"}`}
-            disabled={isCompleted}
-          >
-            {isCompleted ? "Completed ✅" : "Mark as Complete"}
-          </button>
+          {isCompleted ? (
+            <button className="btn btn-disabled" disabled>
+              Completed ✅
+            </button>
+          ) : isWaiting ? (
+            <button className="btn btn-disabled" disabled>
+              Please wait {waitTime}s…
+            </button>
+          ) : (
+            <button onClick={handleMarkComplete} className="btn btn-success">
+              Mark as Complete
+            </button>
+          )}
         </div>
 
-        {/* Controls */}
+        {/* Navigation Controls */}
         <div className="lesson-controls">
-          <button onClick={handlePrev} className="btn btn-light" disabled={activeIndex === 0}>
+          <button
+            onClick={handlePrev}
+            className="btn btn-light"
+            disabled={activeIndex === 0}
+          >
             Back
           </button>
 
           <div className="jump-wrapper">
-            <select className="jump-select" value={current.slug} onChange={handleJump}>
+            <select
+              className="jump-select"
+              value={current.slug}
+              onChange={handleJump}
+            >
               {activities.map((a, i) => (
                 <option key={a.slug} value={a.slug}>
                   {i + 1}. {a.title}
@@ -176,7 +216,7 @@ export default function LessonDetails() {
           </button>
         </div>
 
-        {/* Sidebar list */}
+        {/* Sidebar */}
         <div className="lesson-activity-list">
           <h4>All Lessons</h4>
           <ul>
@@ -189,7 +229,9 @@ export default function LessonDetails() {
               >
                 <Link to={`/modules/${id}/activity/${a.slug}`}>
                   {i + 1}. {a.title}{" "}
-                  {completedLessons.includes(a.slug) && <span className="check">✓</span>}
+                  {completedLessons.includes(a.slug) && (
+                    <span className="check">✓</span>
+                  )}
                 </Link>
               </li>
             ))}
