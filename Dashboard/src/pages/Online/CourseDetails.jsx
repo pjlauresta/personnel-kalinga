@@ -78,61 +78,52 @@ const allCourses = {
       },
     ],
   },
- 
-    "2": {
-      title: "DOH Integrated People-Centered Health Services",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Welcome", "Program Overview", "Learning Objectives"],
-          content: ``, // placeholder
-        },
-        {
-          heading: "Helpful Material",
-          items: ["IPCHS Framework", "Implementation Manual", "Case References"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Understanding IPCHS",
-            "Module 2: Service Integration in the Community",
-            "Module 3: Health Systems Strengthening",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
-
-    "3": {
-      title: "Integrated Course on Primary Care",
-      sections: [
-        {
-          heading: "General Information",
-          items: ["Overview", "Course Goals", "Prerequisites"],
-          content: ``,
-        },
-        {
-          heading: "Helpful Material",
-          items: ["Primary Care Guidelines", "PHC Policy Framework"],
-          content: ``,
-        },
-        {
-          heading: "Training Material",
-          items: [
-            "Pre-Test",
-            "Module 1: Core Primary Health Care Concepts",
-            "Module 2: Preventive and Promotive Services",
-            "Module 3: Primary Care Practice Models",
-            "Final Assessment",
-          ],
-          content: ``,
-        },
-      ],
-    },
-
+  "2": {
+    title: "DOH Integrated People-Centered Health Services",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Welcome", "Program Overview", "Learning Objectives"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["IPCHS Framework", "Implementation Manual", "Case References"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Understanding IPCHS",
+          "Module 2: Service Integration in the Community",
+          "Module 3: Health Systems Strengthening",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
+  "3": {
+    title: "Integrated Course on Primary Care",
+    sections: [
+      {
+        heading: "General Information",
+        items: ["Overview", "Course Goals", "Prerequisites"],
+      },
+      {
+        heading: "Helpful Material",
+        items: ["Primary Care Guidelines", "PHC Policy Framework"],
+      },
+      {
+        heading: "Training Material",
+        items: [
+          "Pre-Test",
+          "Module 1: Core Primary Health Care Concepts",
+          "Module 2: Preventive and Promotive Services",
+          "Module 3: Primary Care Practice Models",
+          "Final Assessment",
+        ],
+      },
+    ],
+  },
     "4": {
       title:
         "Introduction to Seven Major Recommendations to Prevent Tuberculosis Transmission",
@@ -452,9 +443,6 @@ const CourseDetails = () => {
     );
   }
 
-  // ---------------------------
-  // 🔸 Display selected course
-  // ---------------------------
   const course = allCourses[id];
   if (!course)
     return (
@@ -485,20 +473,30 @@ const CourseDetails = () => {
   }
 
   // ---------------------------
-  // 🔸 Section Unlock Logic
+  // 🔸 Progressive Section Unlock Logic
   // ---------------------------
-  const generalDone = isSectionComplete("generalInfo", 4);
-  const helpfulDone = isSectionComplete("helpfulMaterials", 4);
+  const totalLessons = {
+    generalInfo: course.sections[0]?.items.length || 0,
+    helpfulMaterials: course.sections[1]?.items.length || 0,
+    trainingMaterials: course.sections[2]?.items.length || 0,
+  };
+
+  const generalDone = isSectionComplete("generalInfo", totalLessons.generalInfo);
+  const helpfulDone = isSectionComplete(
+    "helpfulMaterials",
+    totalLessons.helpfulMaterials
+  );
 
   const sectionUnlocked = (heading) => {
-    if (heading.includes("General")) return true;
-    if (heading.includes("Helpful")) return generalDone;
-    if (heading.includes("Training")) return generalDone && helpfulDone;
+    if (heading.includes("General")) return true; // Always open
+    if (heading.includes("Helpful")) return generalDone; // Unlock after General done
+    if (heading.includes("Training"))
+      return generalDone && helpfulDone; // Unlock after Helpful done
     return false;
   };
 
   // ---------------------------
-  // 🔸 UI for Course 1 sections
+  // 🔸 UI Rendering
   // ---------------------------
   return (
     <Layout>
@@ -527,6 +525,12 @@ const CourseDetails = () => {
                     )}
                   </span>
                 </div>
+
+                {!unlocked && (
+                  <p className="text-sm text-gray-500 mt-2 ml-5">
+                    🔒 Complete the previous section to unlock this content.
+                  </p>
+                )}
 
                 {unlocked && (
                   <div className="course-items">

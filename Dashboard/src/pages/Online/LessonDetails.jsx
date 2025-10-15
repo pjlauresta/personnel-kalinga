@@ -16,10 +16,20 @@ const slugify = (text = "") =>
     .replace(/[\s\W-]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const handleNextActivity = () => {
-  markLessonComplete("generalInfo", currentLessonId); // or "helpfulMaterials", depending on section
-  navigate(nextLessonUrl);
+const handleMarkComplete = () => {
+  markLessonComplete(id, current.slug); // ✅ id = courseId
+
+  const updated = [...completedLessons, current.slug];
+  setCompletedLessons(updated);
+
+  alert(`✅ You completed: ${current.title}`);
+
+  // Go to next lesson or unlock next section
+  if (updated.length === activities.length) {
+    setTimeout(() => navigate(`/modules/${id}`), 600);
+  }
 };
+
 
 export default function LessonDetails() {
   const { id, activitySlug } = useParams(); // route: /modules/:id/activity/:activitySlug

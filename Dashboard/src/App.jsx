@@ -53,8 +53,10 @@ function App() {
           }
         />
 
-        <Route path="/modules/:id/info/:sectionSlug/:topicSlug" element={<InfoPage />} />
-
+        <Route
+          path="/modules/:id/info/:sectionSlug/:topicSlug"
+          element={<h1>InfoPage working!</h1>}
+        />
 
         {/* ✅ Lesson Details (new) */}
         <Route
