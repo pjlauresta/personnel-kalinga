@@ -11,17 +11,53 @@ export const useTriage = () => {
 };
 
 export const TriageProvider = ({ children, refreshInterval = 30000 }) => {
-  const [triageData, setTriageData] = useState(() => generatePatientTriage());
+  const [triageData, setTriageData] = useState(() => enrichData(generatePatientTriage()));
   const [lastUpdated, setLastUpdated] = useState(Date.now());
 
   useEffect(() => {
     const id = setInterval(() => {
-      setTriageData(generatePatientTriage());
+      setTriageData(enrichData(generatePatientTriage()));
       setLastUpdated(Date.now());
     }, refreshInterval);
     return () => clearInterval(id);
   }, [refreshInterval]);
 
+  /** 🧠 Convert raw triage data → adds:
+   *  - counts: { low, medium, high, very-high, critical }
+   *  - topDoctor: most requested specialist
+   */
+  function enrichData(data) {
+    return data.map((hospitalRow) => {
+      const counts = {
+        low: 0,
+        medium: 0,
+        high: 0,
+        "very-high": 0,
+        critical: 0,
+      };
+
+      const doctorCount = {};
+
+      hospitalRow.patients.forEach((p) => {
+        counts[p.level] = (counts[p.level] || 0) + 1;
+
+        doctorCount[p.recommendedDoctor] =
+          (doctorCount[p.recommendedDoctor] || 0) + 1;
+      });
+
+      const topDoctor =
+        Object.entries(doctorCount).sort((a, b) => b[1] - a[1])[0]?.[0] ??
+        "General Practitioner";
+
+      return {
+        ...hospitalRow,
+        counts,
+        topDoctor,
+      };
+    });
+  }
+
+  /** 🏥 Fast lookup table */
   const hospitalMap = useMemo(() => {
     const map = {};
     triageData.forEach((h) => (map[h.hospital] = h));
@@ -33,7 +69,7 @@ export const TriageProvider = ({ children, refreshInterval = 30000 }) => {
     hospitalMap,
     lastUpdated,
     refresh: () => {
-      setTriageData(generatePatientTriage());
+      setTriageData(enrichData(generatePatientTriage()));
       setLastUpdated(Date.now());
     },
   };

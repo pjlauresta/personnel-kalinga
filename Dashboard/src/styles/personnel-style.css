@@ -2877,3 +2877,152 @@ body {
   padding: 4px 8px;
   display: inline-block;
 }
+/* =========================================
+   GLASS UI FOR EMERGENCY SOS
+   ========================================= */
+
+/* Page title */
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  color: #004225;
+  text-shadow: 0 4px 18px rgba(255, 255, 255, 0.35);
+}
+
+/* Controls container */
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+/* Dropdown styling (fixed) */
+.dropdown {
+  background: #004225; /* <-- semicolon required */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.6rem 1rem;
+  color: #ffffff;
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  outline: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+/* Hover */
+.dropdown:hover {
+  background: #067545; /* <-- semicolon required */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(3, 16, 28, 0.35);
+}
+
+/* Keyboard focus (accessibility) */
+.dropdown:focus {
+  box-shadow: 0 0 0 3px rgba(6, 176, 117, 0.18);
+  outline: none;
+}
+
+/* If you want the dropdown text to be dark on light background instead:
+.dropdown { color: #1a1a1a; background: rgba(255,255,255,0.92); border-color: rgba(0,0,0,0.08); }
+*/
+
+
+/* Map wrapper */
+.map-section {
+  border-radius: 18px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* Reports (Alerts) container */
+.reports-card {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  margin-top: 2rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Alert list items */
+.alert-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: 0.2s ease;
+}
+
+.alert-item:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateX(3px);
+}
+
+/* Alert icons */
+.alert-icon .icon {
+  font-size: 1.6rem;
+  color: #ffae00;
+}
+
+/* For doctor/resource icon */
+.alert-icon .resource {
+  color: #4fd1c5;
+}
+
+/* Alert text */
+.alert-text {
+  color: #000000;
+  font-size: 0.94rem;
+}
+
+/* Alert sub text */
+.alert-hospital {
+  color: #e0e0e0;
+  font-size: 0.82rem;
+}
+
+.alert-time {
+  color: #aaa9a9;
+  font-size: 0.82rem;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.35rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+}
+
+/* Status colors */
+.status-badge.ongoing,
+.status-badge.critical {
+  background: rgba(255, 80, 80, 0.55);
+}
+
+.status-badge.responded {
+  background: rgba(0, 200, 100, 0.55);
+}
+
+.status-badge.pending,
+.status-badge.investigating {
+  background: rgba(255, 170, 0, 0.55);
+}
+
+/* End Glass UI */

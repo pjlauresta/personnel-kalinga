@@ -7,6 +7,8 @@ import { QRCodeCanvas } from "qrcode.react";
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [affiliationModal, setAffiliationModal] = useState(null);
+
   const [profile, setProfile] = useState({
     name: "John Santos",
     role: "Medical Responder",
@@ -29,6 +31,49 @@ const Profile = () => {
     setProfile(tempProfile);
     setIsEditing(false);
   };
+
+  // Sample training data
+  const trainings = [
+    { name: "First Aid Basics", status: "completed" },
+    { name: "Mass Casualty Management", status: "in-progress", progress: 60 },
+    { name: "Advanced Trauma Care", status: "locked" },
+  ];
+
+  // Sample activity logs
+  const activityLogs = [
+    {
+      title: "Responded to PGH Cardiology Shortage",
+      description:
+        "After the system flagged PGH lacking Cardiologists, personnel was dispatched to assist in screening and redirecting cardiac patients.",
+      date: "Oct 28, 2025",
+      alertType: "shortage",
+      location: "Philippine General Hospital",
+    },
+    {
+      title: "Assisted in ICU Overflow – East Avenue Medical Center",
+      description:
+        "Supported triage and patient reassessment after ICU reached 92% capacity.",
+      date: "Oct 25, 2025",
+      alertType: "overflow",
+      location: "East Avenue Medical Center",
+    },
+    {
+      title: "Redirection Support at Rizal Medical Center",
+      description:
+        "Helped redirect moderate-case patients due to limited oxygen supply reported by the system.",
+      date: "Oct 22, 2025",
+      alertType: "resource-limit",
+      location: "Rizal Medical Center",
+    },
+    {
+      title: "Emergency Deployment – Sector 3B Accident",
+      description:
+        "Responded to multi-vehicle collision after alert triggered in the Emergency SOS feed.",
+      date: "Oct 19, 2025",
+      alertType: "emergency",
+      location: "Sector 3B",
+    },
+  ];
 
   return (
     <Layout>
@@ -219,55 +264,65 @@ const Profile = () => {
           <div className="activity-overview">
             <h3>Activity Overview</h3>
 
+            {/* === Recent Logs === */}
             <div className="card recent-logs">
               <h4>Recent Logs</h4>
               <ul className="timeline">
-                <li>
-                  <span className="dot"></span>
-                  <div>
-                    <strong>Flood Response, Quezon City</strong>
-                    <p>Sept 20, 2025</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="dot"></span>
-                  <div>
-                    <strong>Earthquake Drill, Pasig</strong>
-                    <p>Sept 12, 2025</p>
-                  </div>
-                </li>
+                {activityLogs.map((log, idx) => (
+                  <li
+                    key={idx}
+                    className={`log-item ${log.alertType}`}
+                    onClick={() => setAffiliationModal(log)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <span className="dot"></span>
+                    <div>
+                      <strong>{log.title}</strong>
+                      <p>{log.description}</p>
+                      <p className="log-date">{log.date}</p>
+                    </div>
+                  </li>
+                ))}
               </ul>
             </div>
 
+            {/* === Training Progress === */}
             <div className="card training-progress">
               <h4>Training Progress</h4>
               <ul className="timeline">
-                <li>
-                  <span className="dot"></span>
-                  <div>
-                    <strong>First Aid Basics</strong>
-                    <p>Completed</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="dot"></span>
-                  <div>
-                    <strong className="in-progress">
-                      Mass Casualty Management
-                    </strong>
-                    <p>In Progress - 60%</p>
-                    <div className="progress-bar">
-                      <div className="progress" style={{ width: "60%" }}></div>
+                {trainings.map((t, i) => (
+                  <li key={i}>
+                    <span className="dot"></span>
+                    <div>
+                      <strong
+                        className={
+                          t.status === "in-progress"
+                            ? "in-progress"
+                            : t.status === "locked"
+                            ? "locked"
+                            : ""
+                        }
+                      >
+                        {t.name}
+                      </strong>
+                      <p>
+                        {t.status === "in-progress"
+                          ? `In Progress - ${t.progress}%`
+                          : t.status === "locked"
+                          ? "Locked"
+                          : "Completed"}
+                      </p>
+                      {t.status === "in-progress" && (
+                        <div className="progress-bar">
+                          <div
+                            className="progress"
+                            style={{ width: `${t.progress}%` }}
+                          ></div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </li>
-                <li>
-                  <span className="dot"></span>
-                  <div>
-                    <strong className="locked">Advanced Trauma Care</strong>
-                    <p>Locked</p>
-                  </div>
-                </li>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -279,7 +334,10 @@ const Profile = () => {
             className="profile-modal-overlay"
             onClick={() => setShowModal(false)}
           >
-            <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="profile-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
                 className="close-modal"
                 onClick={() => setShowModal(false)}
@@ -287,13 +345,59 @@ const Profile = () => {
                 <FaTimes />
               </button>
               <h3>Verified Profile Information</h3>
-              <p><strong>Name:</strong> {profile.name}</p>
-              <p><strong>Role:</strong> {profile.role}</p>
-              <p><strong>Age:</strong> {profile.age}</p>
-              <p><strong>Address:</strong> {profile.address}</p>
-              <p><strong>Email:</strong> {profile.email}</p>
-              <p><strong>Registered:</strong> {profile.registered}</p>
-              <p><strong>ID:</strong> {profile.id}</p>
+              <p>
+                <strong>Name:</strong> {profile.name}
+              </p>
+              <p>
+                <strong>Role:</strong> {profile.role}
+              </p>
+              <p>
+                <strong>Age:</strong> {profile.age}
+              </p>
+              <p>
+                <strong>Address:</strong> {profile.address}
+              </p>
+              <p>
+                <strong>Email:</strong> {profile.email}
+              </p>
+              <p>
+                <strong>Registered:</strong> {profile.registered}
+              </p>
+              <p>
+                <strong>ID:</strong> {profile.id}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ✅ Modal for activity log details */}
+        {affiliationModal && (
+          <div
+            className="profile-modal-overlay"
+            onClick={() => setAffiliationModal(null)}
+          >
+            <div
+              className="profile-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="close-modal"
+                onClick={() => setAffiliationModal(null)}
+              >
+                <FaTimes />
+              </button>
+              <h3>{affiliationModal.title}</h3>
+              <p>{affiliationModal.description}</p>
+              {affiliationModal.location && (
+                <p>
+                  <strong>Location:</strong> {affiliationModal.location}
+                </p>
+              )}
+              {affiliationModal.date && (
+                <p>
+                  <strong>Date:</strong> {affiliationModal.date}
+                </p>
+              )}
             </div>
           </div>
         )}

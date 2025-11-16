@@ -180,11 +180,11 @@ export const generatePatientTriage = () =>
       "General Practitioner";
 
     // ✅ Use 'name' instead of 'hospital' for compatibility
-    return {
-      name: hospital.name,
-      specialty: hospital.specialty,
-      patients,
-      counts,
-      topDoctor,
-    };
+ return {
+  hospital: hospital.name,         // 🔹 Fix: rename from `name` to `hospital`
+  specialty: hospital.specialty,
+  patients,
+  counts,
+  topDoctor,
+};
   });
