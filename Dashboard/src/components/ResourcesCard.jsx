@@ -6,117 +6,204 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { motion } from "framer-motion";
+import { useTriage } from "../context/TriageProvider";
 import "../styles/personnel-style.css";
 
-const COLORS = ["#1E2A78", "#C0392B", "#145A32", "#F1C40F"]; 
+const COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#facc15", "#8b5cf6"];
 
-// ✅ Data for all centers combined
-const allCentersData = [
-  { name: "Water", value: 5000 },
-  { name: "Food", value: 2500 },
-  { name: "Medicines", value: 800 },
-  { name: "Clothes", value: 500 },
-];
+const calculatePersonnelNeeds = (hospital) => {
+  let doctors = 2,
+    surgeons = 1,
+    cardiologists = 1,
+    nurses = 5,
+    techs = 2;
 
-// ✅ Data for individual centers
-const centers = [
-  {
-    name: "Center 1",
-    data: [
-      { name: "Water", value: 1600 },
-      { name: "Food", value: 800 },
-      { name: "Medicines", value: 260 },
-      { name: "Clothes", value: 150 },
-    ],
-  },
-  {
-    name: "Center 2",
-    data: [
-      { name: "Water", value: 1400 },
-      { name: "Food", value: 900 },
-      { name: "Medicines", value: 280 },
-      { name: "Clothes", value: 120 },
-    ],
-  },
-  {
-    name: "Center 3",
-    data: [
-      { name: "Water", value: 2000 },
-      { name: "Food", value: 800 },
-      { name: "Medicines", value: 260 },
-      { name: "Clothes", value: 230 },
-    ],
-  },
-];
+  hospital.patients.forEach((p) => {
+    switch (p.severity) {
+      case "critical":
+        doctors += 2;
+        surgeons += 1;
+        cardiologists += 1;
+        nurses += 3;
+        techs += 1;
+        break;
+      case "high":
+        doctors += 1;
+        nurses += 2;
+        techs += 1;
+        break;
+      case "medium":
+        doctors += 1;
+        nurses += 1;
+        break;
+      default:
+        break;
+    }
+  });
+
+  return [
+    { name: "General Doctors", value: doctors },
+    { name: "Surgeons", value: surgeons },
+    { name: "Cardiologists", value: cardiologists },
+    { name: "Nurses", value: nurses },
+    { name: "Technicians", value: techs },
+  ];
+};
 
 const ResourcesCard = () => {
+  const { triageData, lastUpdated } = useTriage();
+
+  // Derive hospital data with specialty
+  const hospitalsData = triageData.map((h) => ({
+    name: h.hospital,
+    specialty: h.specialty,
+    data: calculatePersonnelNeeds(h),
+  }));
+
+  // Combine total data
+  const allData = hospitalsData
+    .flatMap((h) => h.data)
+    .reduce((acc, cur) => {
+      const existing = acc.find((a) => a.name === cur.name);
+      if (existing) existing.value += cur.value;
+      else acc.push({ ...cur });
+      return acc;
+    }, []);
+
   return (
-    <div className="card resources-card">
-      <h3 className="card-title">Resources</h3>
-
-      {/* ✅ Main Row (Legend + Donut + Centers 1-3) */}
-      <div className="resources-main-row">
-
-        {/* Legend */}
-        <div className="resources-legend">
-          <h4>All Centers</h4>
-          <ul>
-            <li><span className="legend-box water"></span> Water - 5000 bottles</li>
-            <li><span className="legend-box food"></span> Food - 2500 packs</li>
-            <li><span className="legend-box medicine"></span> Medicines - 800 kits</li>
-            <li><span className="legend-box clothes"></span> Clothes - 500 packs</li>
-          </ul>
+    <motion.div
+      className="card resources-card enhanced-card"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <div className="resources-header">
+        <div>
+          <h3 className="card-title">Personnel Requirements Dashboard</h3>
+          <p className="card-subtitle">
+            Live estimation of staff needs across major hospitals.
+          </p>
         </div>
+        <div className="last-updated">
+          ⏱️ Updated {new Date(lastUpdated).toLocaleTimeString()}
+        </div>
+      </div>
 
-        {/* Donut */}
-        <div className="resources-donut">
-          <ResponsiveContainer width={250} height={250}>
+      {/* Layout */}
+      <div className="resources-layout">
+        {/* 📊 Overall Donut Chart */}
+        <motion.div
+          className="resources-main-chart"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 200 }}
+        >
+          <h4>Overall Personnel Requirement</h4>
+          <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
-                data={allCentersData}
+                data={allData}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={3}
+                innerRadius={80}
+                outerRadius={120}
+                paddingAngle={5}
                 dataKey="value"
+                labelLine={false}
               >
-                {allCentersData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                {allData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#0f172a",
+                  color: "#f9fafb",
+                  borderRadius: "8px",
+                  border: "none",
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
-        {/* Individual Centers */}
-        <div className="resources-right">
-          {centers.map((center, i) => (
-            <div key={i} className="center-pie">
-              <h5>{center.name}</h5>
-              <ResponsiveContainer width={160} height={160}>
+        {/* 🧮 Summary */}
+        <div className="resources-summary modern-summary">
+          <h4>All Hospitals Summary</h4>
+          <ul>
+            {allData.map((item, i) => (
+              <li key={i}>
+                <span
+                  className="summary-dot"
+                  style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                ></span>
+                {item.name}
+                <strong>{item.value}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* 🏥 Hospital Breakdown */}
+      <div className="resources-hospitals">
+        {hospitalsData.map((hospital, i) => {
+          const totalStaff = hospital.data.reduce(
+            (sum, item) => sum + item.value,
+            0
+          );
+
+          return (
+            <motion.div
+              key={i}
+              className="hospital-mini-card modern-card"
+              style={{
+                borderTop: `4px solid ${COLORS[i % COLORS.length]}`,
+              }}
+              whileHover={{ scale: 1.04, y: -3 }}
+            >
+              <div className="hospital-info">
+                <div className="hospital-name">{hospital.name}</div>
+                <div className="hospital-specialty">{hospital.specialty}</div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
                   <Pie
-                    data={center.data}
+                    data={hospital.data}
                     cx="50%"
                     cy="50%"
                     outerRadius={70}
                     dataKey="value"
-                    labelLine={false}
                   >
-                    {center.data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                    {hospital.data.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#111827",
+                      color: "#f3f4f6",
+                      borderRadius: "6px",
+                      border: "none",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-          ))}
-        </div>
+              <div className="hospital-total">
+                Total Staff: <strong>{totalStaff}</strong>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

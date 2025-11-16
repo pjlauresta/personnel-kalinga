@@ -60,6 +60,18 @@ export default function LessonDetails() {
   const [completedLessons, setCompletedLessons] = useState([]);
   const [waitTime, setWaitTime] = useState(current.requiredTime || 10);
   const [isWaiting, setIsWaiting] = useState(true);
+  const [isAssessmentPassed, setIsAssessmentPassed] = useState(true);
+
+  // ✅ Check for assessment score (for current module)
+  useEffect(() => {
+    const storedResults = JSON.parse(localStorage.getItem("assessmentResults")) || {};
+    const result = storedResults[id];
+    if (result && result.score < 80) {
+      setIsAssessmentPassed(false);
+    } else {
+      setIsAssessmentPassed(true);
+    }
+  }, [id]);
 
   // ✅ Timer logic: force at least 10s stay per lesson
   useEffect(() => {
@@ -71,7 +83,7 @@ export default function LessonDetails() {
     let timer;
     const timeLimit = current.requiredTime ?? 10;
 
-    // if already completed or training materials
+    // If already completed or training materials
     if (timeLimit === 0 || saved.includes(current.slug)) {
       setIsWaiting(false);
       setWaitTime(0);
@@ -92,6 +104,11 @@ export default function LessonDetails() {
   }, [id, activitySlug]);
 
   const handleMarkComplete = () => {
+    if (!isAssessmentPassed) {
+      alert("❌ You need to pass the assessment (80% or higher) before moving to the next lesson.");
+      return;
+    }
+
     const saved = JSON.parse(localStorage.getItem(progressKey)) || [];
     if (!saved.includes(current.slug)) {
       const updated = [...saved, current.slug];
@@ -118,6 +135,11 @@ export default function LessonDetails() {
   };
 
   const handleNext = () => {
+    if (!isAssessmentPassed) {
+      alert("❌ You need to pass the assessment (80% or higher) before moving to the next lesson.");
+      return;
+    }
+    if (isWaiting) return; // prevent skipping before 10s
     if (activeIndex < activities.length - 1)
       navigate(`/modules/${id}/activity/${activities[activeIndex + 1].slug}`);
   };
@@ -183,7 +205,7 @@ export default function LessonDetails() {
           )}
         </div>
 
-        {/* Navigation Controls */}
+        {/* ✅ Navigation Controls */}
         <div className="lesson-controls">
           <button
             onClick={handlePrev}
@@ -207,12 +229,25 @@ export default function LessonDetails() {
             </select>
           </div>
 
+          {/* ✅ Disable Next button if timer not finished or failed assessment */}
           <button
             onClick={handleNext}
-            className="btn btn-light"
-            disabled={activeIndex === activities.length - 1}
+            className={`btn ${
+              isWaiting || !isAssessmentPassed ? "btn-disabled" : "btn-light"
+            }`}
+            disabled={
+              activeIndex === activities.length - 1 ||
+              isWaiting ||
+              !isAssessmentPassed
+            }
           >
-            Next
+            {isAssessmentPassed
+              ? isWaiting
+                ? `Please wait ${waitTime}s…`
+                : activeIndex === activities.length - 1
+                ? "End"
+                : "Next"
+              : "Locked (Fail)"}
           </button>
         </div>
 

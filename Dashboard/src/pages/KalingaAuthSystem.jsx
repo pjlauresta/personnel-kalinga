@@ -1,5 +1,4 @@
-// src/pages/Auth/KalingaAuthSystem.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Shield,
   Eye,
@@ -14,12 +13,18 @@ import "./KalingaAuthSystem.css";
 const KalingaAuthSystem = () => {
   const navigate = useNavigate();
 
-  // top-level step: "login" | "signup" | "verify-id" | "verify-info" | "verify-address"
+  // 🔹 Check if user is already logged in on component mount
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn");
+    if (loggedIn === "true") {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
   const [step, setStep] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
-    // signup / verify fields
     firstName: "",
     lastName: "",
     middleName: "",
@@ -41,23 +46,22 @@ const KalingaAuthSystem = () => {
 
   const update = (field, value) =>
     setForm((p) => ({ ...p, [field]: value }));
+
   const updateDOB = (field, value) =>
     setForm((p) => ({ ...p, dob: { ...p.dob, [field]: value } }));
 
-  // Demo sign-in logic: navigate to dashboard if correct credentials
   const handleSignIn = (e) => {
     e?.preventDefault();
+    // 🔹 Demo login condition
     if (form.email === "admin@kalinga.ph" && form.password === "1234") {
       localStorage.setItem("isLoggedIn", "true");
       navigate("/dashboard");
     } else {
-      // if not an existing demo account, start the verification/signup flow:
       setStep("verify-id");
     }
   };
 
   const handleFinalConfirm = () => {
-    // do any final validation or API call here
     localStorage.setItem("isLoggedIn", "true");
     navigate("/dashboard");
   };
@@ -65,19 +69,23 @@ const KalingaAuthSystem = () => {
   return (
     <div className="auth-root">
       <div className="auth-inner">
-
-        {/* LEFT: big logo + brand (stays mounted so focus isn't lost on inputs) */}
+        {/* LEFT SIDE */}
         <div className="auth-left">
           <div className="auth-left-content">
-            <img src="/kalinga-logo.svg" alt="KALINGA logo" className="auth-left-logo" />
+            <img
+              src="/kalinga-logo.svg"
+              alt="KALINGA logo"
+              className="auth-left-logo"
+            />
             <h1 className="auth-brand">KALINGA</h1>
             <p className="auth-tagline">
-              <strong>ALISTO</strong> sa bawat sakuna, <strong>TATAG</strong> sa bawat pagbangon.
+              <strong>ALISTO</strong> sa bawat sakuna,{" "}
+              <strong>TATAG</strong> sa bawat pagbangon.
             </p>
           </div>
         </div>
 
-        {/* RIGHT: forms — switch content by `step` */}
+        {/* RIGHT SIDE */}
         <div className="auth-right">
           {step === "login" && (
             <div className="auth-card">
@@ -162,35 +170,61 @@ const KalingaAuthSystem = () => {
 
               <div className="grid-2">
                 <div className="grid-3">
+                  {/* ✅ Birthday dropdowns */}
                   <select
-  className="select"
-  value={form.dob.month}
-  onChange={(e) => updateDOB("month", e.target.value)}
->
-  <option value="" disabled hidden>Month</option>
-  {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => (
-    <option key={i} value={i + 1}>{m}</option>
-  ))}
-</select>
+                    className="select dob-select"
+                    value={form.dob.month}
+                    onChange={(e) => updateDOB("month", e.target.value)}
+                    required
+                  >
+                    <option value="" disabled hidden>
+                      Month
+                    </option>
+                    {[
+                      "Jan",
+                      "Feb",
+                      "Mar",
+                      "Apr",
+                      "May",
+                      "Jun",
+                      "Jul",
+                      "Aug",
+                      "Sep",
+                      "Oct",
+                      "Nov",
+                      "Dec",
+                    ].map((m, i) => (
+                      <option key={i} value={i + 1}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
 
                   <select
-                    className="select"
+                    className="select dob-select"
                     value={form.dob.day}
                     onChange={(e) => updateDOB("day", e.target.value)}
+                    required
                   >
-                    <option value="" disabled hidden>Day</option>
+                    <option value="" disabled hidden>
+                      Day
+                    </option>
                     {Array.from({ length: 31 }, (_, i) => (
                       <option key={i} value={i + 1}>
                         {i + 1}
                       </option>
                     ))}
                   </select>
+
                   <select
-                    className="select"
+                    className="select dob-select"
                     value={form.dob.year}
                     onChange={(e) => updateDOB("year", e.target.value)}
+                    required
                   >
-                    <option>Year</option>
+                    <option value="" disabled hidden>
+                      Year
+                    </option>
                     {Array.from({ length: 80 }, (_, i) => (
                       <option key={i} value={2024 - i}>
                         {2024 - i}
@@ -199,27 +233,36 @@ const KalingaAuthSystem = () => {
                   </select>
                 </div>
 
+                {/* ✅ Sex dropdown */}
                 <select
-                  className="select"
+                  className="select sex-select"
                   value={form.sex}
                   onChange={(e) => update("sex", e.target.value)}
+                  required
                 >
-                  <option value="">Sex</option>
+                  <option value="" disabled hidden>
+                    Select Sex
+                  </option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
               </div>
 
+              {/* ✅ User Type dropdown */}
               <select
-                className="select"
+                className="select usertype-select"
                 value={form.userType}
                 onChange={(e) => update("userType", e.target.value)}
+                required
               >
-                <option value="">User Type</option>
-                <option value="emergency-responder">Emergency Responder</option>
+                <option value="" disabled hidden>
+                  Select User Type
+                </option>
+                <option value="emergency-responder">
+                  Emergency Responder
+                </option>
                 <option value="medical-personnel">Medical Personnel</option>
                 <option value="coordinator">Emergency Coordinator</option>
-
               </select>
 
               <div className="grid-2">
@@ -288,11 +331,14 @@ const KalingaAuthSystem = () => {
               <label className="label">Accepted IDs</label>
               <div className="relative">
                 <select
-                  className="select"
+                  className="select id-select"
                   value={form.idType}
                   onChange={(e) => update("idType", e.target.value)}
+                  required
                 >
-                  <option value="">Choose ID</option>
+                  <option value="" disabled hidden>
+                    Choose ID
+                  </option>
                   <option>PRC ID</option>
                   <option>Driver's License</option>
                   <option>Passport</option>
@@ -358,13 +404,27 @@ const KalingaAuthSystem = () => {
 
               <div className="grid-3">
                 <select
-                  className="select"
+                  className="select dob-select"
                   value={form.dob.month}
                   onChange={(e) => updateDOB("month", e.target.value)}
+                  required
                 >
-                  <option>Month</option>
+                  <option value="" disabled hidden>
+                    Month
+                  </option>
                   {[
-                    "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
                   ].map((m, i) => (
                     <option key={i} value={i + 1}>
                       {m}
@@ -373,11 +433,14 @@ const KalingaAuthSystem = () => {
                 </select>
 
                 <select
-                  className="select"
+                  className="select dob-select"
                   value={form.dob.day}
                   onChange={(e) => updateDOB("day", e.target.value)}
+                  required
                 >
-                  <option>Day</option>
+                  <option value="" disabled hidden>
+                    Day
+                  </option>
                   {Array.from({ length: 31 }, (_, i) => (
                     <option key={i} value={i + 1}>
                       {i + 1}
@@ -386,11 +449,14 @@ const KalingaAuthSystem = () => {
                 </select>
 
                 <select
-                  className="select"
+                  className="select dob-select"
                   value={form.dob.year}
                   onChange={(e) => updateDOB("year", e.target.value)}
+                  required
                 >
-                  <option>Year</option>
+                  <option value="" disabled hidden>
+                    Year
+                  </option>
                   {Array.from({ length: 80 }, (_, i) => (
                     <option key={i} value={2024 - i}>
                       {2024 - i}

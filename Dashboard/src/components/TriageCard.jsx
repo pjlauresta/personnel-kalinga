@@ -1,117 +1,94 @@
-// src/components/TriageCard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import "../styles/triage-style.css";
+import { useTriage } from "../context/TriageProvider"; // 🧠 shared context
 
-// ✅ DOH Hospitals in Metro Manila (same dataset used in MapCard)
-const hospitals = [
-  {
-    name: "Philippine General Hospital (PGH)",
-    position: [14.5794, 120.9822],
-    specialty: "Cardiology, Emergency, Pediatrics",
-  },
-  {
-    name: "East Avenue Medical Center",
-    position: [14.6362, 121.0437],
-    specialty: "Neurology, Internal Medicine, Trauma Care",
-  },
-  {
-    name: "Rizal Medical Center",
-    position: [14.5641, 121.0713],
-    specialty: "Surgery, Obstetrics & Gynecology",
-  },
-  {
-    name: "Jose R. Reyes Memorial Medical Center",
-    position: [14.6155, 120.9843],
-    specialty: "Emergency, Neurosurgery, Pediatrics",
-  },
-  {
-    name: "St. Luke’s Medical Center (Quezon City)",
-    position: [14.6397, 121.0518],
-    specialty: "Cardiology, Orthopedics, Oncology",
-  },
-];
+const TriageCard = ({ userType = "Cardiologist" }) => {
+  const { triageData } = useTriage(); // 🧠 shared from context
+  const [updatedDoctor, setUpdatedDoctor] = useState(null);
+  const [selectedHospital, setSelectedHospital] = useState(null);
+  const [recommendedActions, setRecommendedActions] = useState([]);
 
-// 🧮 Function to simulate patient load per hospital
-const generateTriageData = () =>
-  hospitals.map((hospital) => {
-    const base = Math.floor(Math.random() * 60 + 80); // base patient count
-    return {
-      hospital: hospital.name,
-      low: Math.floor(base * 0.5),
-      medium: Math.floor(base * 0.2),
-      high: Math.floor(base * 0.15),
-      veryHigh: Math.floor(base * 0.1),
-      critical: Math.floor(base * 0.05),
-    };
-  });
-
-const TriageCard = () => {
-  const [triageData, setTriageData] = useState(generateTriageData());
-  const [userLocation, setUserLocation] = useState(null);
-
-  // 🔹 Track user location to simulate nearby updates
+  // 🩺 Trigger glow animation when triage data refreshes
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
-        },
-        () => {
-          setUserLocation([14.5995, 120.9842]); // Default: Manila
-        }
-      );
-    } else {
-      setUserLocation([14.5995, 120.9842]);
-    }
-  }, []);
+    if (!triageData) return;
+    setUpdatedDoctor(Date.now()); // triggers glow pulse
+  }, [triageData]);
 
-  // 🔄 Update triage data periodically (every 20s for demo)
+  // 🧩 Filter top 5 patients requiring the current user's specialization
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTriageData(generateTriageData());
-    }, 20000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!triageData) return;
+
+    const actions = triageData
+      .flatMap((row) =>
+        row.patients
+          .filter((p) => p.recommendedDoctor === userType)
+          .map((p) => ({
+            hospital: row.hospital,
+            complaint: p.complaint,
+            level: p.level,
+          }))
+      )
+      .slice(0, 5);
+
+    setRecommendedActions(actions);
+  }, [triageData, userType]);
 
   return (
-    <div className="card triage-card">
-      <h3 className="card-title">
-        DOH Hospitals Triage System
-        {userLocation && (
-          <span style={{ fontSize: "0.8rem", color: "#666", marginLeft: "8px" }}>
-            (Based on your current location in Manila)
-          </span>
-        )}
-      </h3>
+    <div className="card triage-card modern-card">
+      <h3 className="card-title">Patients Triage Monitoring</h3>
+      <p className="card-subtitle">
+        Sensor-based real-time triage per DOH-accredited hospital
+      </p>
 
+      {/* 🏥 Hospital Summary Table */}
       <div className="triage-table-wrapper">
-        <table className="triage-table">
+        <table className="triage-table modern-table">
           <thead>
             <tr>
-              <th>DOH Accredited Hospital</th>
+              <th>Hospital</th>
               <th className="low">Low</th>
               <th className="medium">Medium</th>
               <th className="high">High</th>
               <th className="very-high">Very High</th>
               <th className="critical">Critical</th>
+              <th>Priority Specialist</th>
             </tr>
           </thead>
           <tbody>
             {triageData.map((row, i) => (
-              <tr key={i}>
-                <td>{row.hospital}</td>
-                <td className="low">{row.low}</td>
-                <td className="medium">{row.medium}</td>
-                <td className="high">{row.high}</td>
-                <td className="very-high">{row.veryHigh}</td>
-                <td className="critical">{row.critical}</td>
+              <tr
+                key={i}
+                onClick={() => setSelectedHospital(row)}
+                className="clickable-row"
+              >
+                <td>
+                  <strong>{row.hospital}</strong>
+                  <div className="subtext">{row.specialty}</div>
+                </td>
+                <td className="low align-center">{row.counts?.low || 0}</td>
+                <td className="medium align-center">{row.counts?.medium || 0}</td>
+                <td className="high align-center">{row.counts?.high || 0}</td>
+                <td className="very-high align-center">{row.counts?.["very-high"] || 0}</td>
+                <td className="critical align-center">{row.counts?.critical || 0}</td>
+
+                {/* 🩺 Priority Specialist with Glow Animation */}
+                <td>
+                  <span
+                    className={`doctor-badge ${row.topDoctor
+                      ?.toLowerCase()
+                      .replace(/\s+/g, "-")} ${updatedDoctor ? "updated" : ""}`}
+                  >
+                    {row.topDoctor}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Legend */}
+      {/* 🧭 Legend */}
       <div className="triage-legend">
         <span><span className="legend-dot low"></span> Low</span>
         <span><span className="legend-dot medium"></span> Medium</span>
@@ -119,6 +96,100 @@ const TriageCard = () => {
         <span><span className="legend-dot very-high"></span> Very High</span>
         <span><span className="legend-dot critical"></span> Critical</span>
       </div>
+
+      {/* 🧠 Recommended Actions */}
+      <div className="recommendations-card">
+        <h4>Recommended Actions for {userType}</h4>
+        {recommendedActions.length > 0 ? (
+          <ul className="recommendations-list">
+            {recommendedActions.map((rec, idx) => (
+              <li key={idx} className="recommendation-item">
+                <span className="recommendation-icon">📍</span>
+                <div className="recommendation-text">
+                  <b>{rec.hospital}</b> — Patient with <b>{rec.complaint}</b>
+                </div>
+                <span className={`priority-badge ${rec.level}`}>
+                  {rec.level} priority
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p style={{ color: "#6b7280", fontSize: "0.9rem" }}>
+            No current patients requiring {userType} attention.
+          </p>
+        )}
+      </div>
+
+      {/* 🏥 Modal View for Hospital Details */}
+      <AnimatePresence>
+        {selectedHospital && (
+          <motion.div
+            className="modal-overlay"
+            onClick={() => setSelectedHospital(null)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <button
+                className="modal-close"
+                onClick={() => setSelectedHospital(null)}
+              >
+                ✖
+              </button>
+              <h3>{selectedHospital.hospital}</h3>
+              <p className="modal-subtext">{selectedHospital.specialty}</p>
+
+              <table className="modal-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Age</th>
+                    <th>Temp (°C)</th>
+                    <th>HR (bpm)</th>
+                    <th>SpO₂ (%)</th>
+                    <th>Comorbidity</th>
+                    <th>Complaint</th>
+                    <th>Mental Status</th>
+                    <th>Level</th>
+                    <th>Doctor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedHospital.patients.map((p, idx) => (
+                    <tr key={idx}>
+                      <td>{p.id}</td>
+                      <td>{p.age}</td>
+                      <td>{p.temp}</td>
+                      <td>{p.heartRate}</td>
+                      <td>{p.spo2}</td>
+                      <td>{p.comorbidity ? "Yes" : "No"}</td>
+                      <td>{p.complaint}</td>
+                      <td>{p.mentalStatus}</td>
+                      <td className={p.level}>{p.level}</td>
+                      <td>{p.recommendedDoctor}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <button
+                className="close-btn"
+                onClick={() => setSelectedHospital(null)}
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

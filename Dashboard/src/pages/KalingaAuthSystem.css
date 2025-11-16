@@ -505,3 +505,144 @@
 .select:invalid {
   color: #888;
 }
+
+/* Fallback version (safe for all browsers) */
+.select {
+  color: #888;
+}
+.select:valid {
+  color: #000;
+}
+.select option[value=""],
+.select option:first-child {
+  color: #888;
+}
+/* ===================================================
+   Placeholder gray text for Birthday & ID dropdowns
+   =================================================== */
+.dob-select,
+.id-select {
+  color: #888;
+}
+
+.dob-select:valid,
+.id-select:valid {
+  color: #000;
+}
+
+.dob-select option[value=""],
+.id-select option[value=""],
+.dob-select option:first-child,
+.id-select option:first-child {
+  color: #888;
+}
+
+.dob-select:focus,
+.id-select:focus {
+  outline: none;
+  border-color: #5b7fff;
+  box-shadow: 0 0 0 2px rgba(91, 127, 255, 0.2);
+}
+/* Unified dropdown placeholder style for Birthday, ID, Sex, and User Type */
+
+.dob-select,
+.id-select,
+.sex-select,
+.usertype-select {
+  color: #888;
+}
+
+.dob-select:valid,
+.id-select:valid,
+.sex-select:valid,
+.usertype-select:valid {
+  color: #000;
+}
+
+.dob-select option[value=""],
+.id-select option[value=""],
+.sex-select option[value=""],
+.usertype-select option[value=""],
+.dob-select option:first-child,
+.id-select option:first-child,
+.sex-select option:first-child,
+.usertype-select option:first-child {
+  color: #888;
+}
+
+/* optional nice focus border */
+.dob-select:focus,
+.id-select:focus,
+.sex-select:focus,
+.usertype-select:focus {
+  outline: none;
+  border-color: #5b7fff;
+  box-shadow: 0 0 0 2px rgba(91, 127, 255, 0.2);
+}
+/* ====== Birthday + Sex dropdown width alignment ====== */
+.grid-2 .grid-3 {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.dob-select {
+  flex: 1 1 0;
+  min-width: 80px;
+}
+
+.sex-select {
+  width: 140px; /* ✅ reduce width so it's visually balanced */
+}
+
+/* If you want all four to perfectly fill one line evenly */
+@media (min-width: 768px) {
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 3fr 2fr; /* ✅ gives more space to birthday fields */
+    gap: 0.75rem;
+  }
+}
+/* Forcefully override button styles */
+.auth-right .btn-primary {
+  background-color: #0d5c49 !important; /* Deep green */
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 0.9rem 1.6rem;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.auth-right .btn-primary:hover {
+  background-color: #0b4f3f !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Secondary buttons (light) */
+.auth-right .btn-secondary {
+  background-color: #edf3f1 !important;
+  color: #4b4b4b !important;
+  font-weight: 600;
+  padding: 0.9rem 1.6rem;
+  border-radius: 10px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.auth-right .btn-secondary:hover {
+  background-color: #dfe8e6 !important;
+  transform: translateY(-1px);
+}
+
+/* Consistent grid gap */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem !important;
+}
